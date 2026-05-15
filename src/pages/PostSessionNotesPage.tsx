@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { sessionStore } from '@/lib/sessionStore';
 import { supabase } from '@/lib/supabase';
+import { NotePencil } from '@phosphor-icons/react';
 
 export function PostSessionNotesPage() {
   const navigate = useNavigate();
@@ -25,29 +26,36 @@ export function PostSessionNotesPage() {
       })
       .eq('id', id);
     sessionStore.clear();
-    // Fire-and-forget — generates AI summary in background
     supabase.functions.invoke('generate-session-insights', { body: { sessionId: id } });
     setSaving(false);
     navigate(`/session/${id}/report`);
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center p-8" style={{ backgroundColor: '#F4F6F9' }}>
+    <div className="min-h-screen flex flex-col items-center justify-center p-8" style={{ backgroundColor: '#F8FAFC' }}>
       <div className="w-full max-w-lg">
-        <div className="mb-8">
-          <h1 className="text-2xl font-bold text-headway-navy">Session notes</h1>
-          <p className="text-sm text-gray-400 mt-1">
-            Record your observations for {session.clientIdentifier}'s session.
-          </p>
+        <div className="flex items-center gap-3 mb-8">
+          <div className="w-10 h-10 rounded-xl flex items-center justify-center"
+            style={{ backgroundColor: '#EEF3FA' }}>
+            <NotePencil weight="duotone" className="w-5 h-5" style={{ color: '#003361' }} />
+          </div>
+          <div>
+            <h1 className="text-xl font-bold tracking-tight" style={{ color: '#003361', letterSpacing: '-0.02em' }}>
+              Session notes
+            </h1>
+            <p className="text-sm text-slate-400">
+              {session.clientIdentifier}'s session
+            </p>
+          </div>
         </div>
 
-        <div className="bg-white rounded-2xl shadow-sm p-6 mb-6">
+        <div className="bg-white rounded-2xl shadow-sm p-6 mb-5 border border-slate-100">
           <textarea
             value={notes}
             onChange={e => setNotes(e.target.value)}
-            placeholder="Note any observations, behaviours, or responses during the session…"
-            rows={9}
-            className="w-full resize-none text-sm text-gray-700 focus:outline-none leading-relaxed placeholder:text-gray-300"
+            placeholder="Record your observations, behaviours, or responses from this session…"
+            rows={10}
+            className="w-full resize-none text-sm text-slate-700 focus:outline-none leading-relaxed placeholder:text-slate-300"
             autoFocus
           />
         </div>
@@ -56,15 +64,15 @@ export function PostSessionNotesPage() {
           <button
             onClick={() => closeSession(notes.trim() || null)}
             disabled={saving}
-            className="w-full py-4 rounded-xl font-bold text-base transition-colors"
+            className="w-full py-4 rounded-xl font-semibold text-sm transition-colors"
             style={{ backgroundColor: '#003361', color: 'white' }}
           >
-            {saving ? 'Saving…' : 'Save & view report'}
+            {saving ? 'Saving…' : 'Save notes & view report'}
           </button>
           <button
             onClick={() => closeSession(null)}
             disabled={saving}
-            className="w-full py-3 rounded-xl text-gray-400 text-sm hover:text-gray-600 transition-colors"
+            className="w-full py-3 rounded-xl text-slate-400 text-sm hover:text-slate-600 transition-colors"
           >
             Skip notes
           </button>

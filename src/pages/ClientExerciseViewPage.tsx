@@ -8,15 +8,19 @@ import { SequenceRecall } from '@/exercises/SequenceRecall';
 import { WordGames } from '@/exercises/WordGames';
 import { SpatialPuzzle } from '@/exercises/SpatialPuzzle';
 import { FocusChallenge } from '@/exercises/FocusChallenge';
+import {
+  HandWaving, CheckCircle, Star, ArrowRight,
+  Cards, GridFour, ListNumbers, TextT, PuzzlePiece, Crosshair,
+} from '@phosphor-icons/react';
 import type { ExerciseType, RoundTelemetry } from '@/types';
 
-const EXERCISE_META: Record<ExerciseType, { label: string; icon: string }> = {
-  memory:    { label: 'Memory Match',        icon: '🃏' },
-  pattern:   { label: 'Pattern Recognition', icon: '🎨' },
-  sequence:  { label: 'Sequence Recall',     icon: '🔢' },
-  word:      { label: 'Word Games',          icon: '📝' },
-  spatial:   { label: 'Spatial Puzzle',      icon: '🧩' },
-  attention: { label: 'Focus Challenge',     icon: '🔍' },
+const EXERCISE_META: Record<ExerciseType, { label: string; icon: React.ReactNode }> = {
+  memory:    { label: 'Memory Match',        icon: <Cards weight="duotone" className="w-5 h-5" /> },
+  pattern:   { label: 'Pattern Recognition', icon: <GridFour weight="duotone" className="w-5 h-5" /> },
+  sequence:  { label: 'Sequence Recall',     icon: <ListNumbers weight="duotone" className="w-5 h-5" /> },
+  word:      { label: 'Word Games',          icon: <TextT weight="duotone" className="w-5 h-5" /> },
+  spatial:   { label: 'Spatial Puzzle',      icon: <PuzzlePiece weight="duotone" className="w-5 h-5" /> },
+  attention: { label: 'Focus Challenge',     icon: <Crosshair weight="duotone" className="w-5 h-5" /> },
 };
 
 interface CompletedExercise {
@@ -34,26 +38,24 @@ export function ClientExerciseViewPage() {
 
   const [phase, setPhase] = useState<Phase>('welcome');
   const [currentIndex, setCurrentIndex] = useState(0);
-  // Track active exercise type in a ref to avoid stale closure in callbacks
   const activeTypeRef = useRef<ExerciseType | null>(null);
   const currentIndexRef = useRef<number>(0);
 
-  // Display state for the exercise screen
   const [displayType, setDisplayType] = useState<ExerciseType | null>(null);
   const [completedExercises, setCompletedExercises] = useState<CompletedExercise[]>([]);
   const [_currentScore, setCurrentScore] = useState(0);
 
-  // Telemetry accumulator
   const exerciseStartRef = useRef<number>(Date.now());
   const roundsRef = useRef<RoundTelemetry[]>([]);
   const sessionExerciseIdRef = useRef<string | null>(null);
 
   if (!session) {
     return (
-      <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: '#F5F9FF' }}>
+      <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: '#F0F7FF' }}>
         <div className="text-center p-8">
-          <p className="text-2xl font-bold mb-4" style={{ color: '#003361' }}>No active session.</p>
-          <button onClick={() => navigate('/dashboard')} className="underline text-blue-600">
+          <p className="text-xl font-semibold mb-4" style={{ color: '#003361' }}>No active session.</p>
+          <button onClick={() => navigate('/dashboard')}
+            className="text-sm underline" style={{ color: '#6491C0' }}>
             Return to dashboard
           </button>
         </div>
@@ -151,22 +153,25 @@ export function ClientExerciseViewPage() {
   // ── Welcome ──────────────────────────────────────────────────────────────────
   if (phase === 'welcome') {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center p-8" style={{ backgroundColor: '#F5F9FF' }}>
+      <div className="min-h-screen flex flex-col items-center justify-center p-8" style={{ backgroundColor: '#F0F7FF' }}>
         <div className="text-center max-w-sm w-full">
-          <div className="text-6xl mb-6">👋</div>
-          <h1 className="text-3xl font-bold mb-3" style={{ color: '#003361' }}>
+          <div className="w-20 h-20 rounded-3xl flex items-center justify-center mx-auto mb-8"
+            style={{ backgroundColor: '#003361' }}>
+            <HandWaving weight="fill" className="w-10 h-10 text-white" />
+          </div>
+          <h1 className="text-3xl font-bold mb-3 tracking-tight" style={{ color: '#003361', letterSpacing: '-0.02em' }}>
             Hello, {clientIdentifier}
           </h1>
-          <p className="text-gray-500 text-lg mb-2">
-            Your therapist has prepared {selectedExercises.length} exercise{selectedExercises.length !== 1 ? 's' : ''} for you today.
+          <p className="text-slate-500 text-lg mb-2 leading-relaxed">
+            Your therapist has set up {selectedExercises.length} exercise{selectedExercises.length !== 1 ? 's' : ''} for you today.
           </p>
-          <p className="text-gray-400 mb-10">Take your time — there is no rush.</p>
+          <p className="text-slate-400 mb-10">Take your time — there is no rush at all.</p>
           <button
             onClick={handleStart}
-            className="w-full py-5 rounded-2xl text-xl font-bold transition-transform active:scale-95"
+            className="w-full py-5 rounded-2xl text-lg font-semibold transition-transform active:scale-95 flex items-center justify-center gap-2"
             style={{ backgroundColor: '#003361', color: 'white' }}
           >
-            Let's start
+            Let's begin <ArrowRight weight="bold" className="w-5 h-5" />
           </button>
         </div>
       </div>
@@ -177,20 +182,23 @@ export function ClientExerciseViewPage() {
   if (phase === 'exercise' && displayType) {
     const meta = EXERCISE_META[displayType];
     return (
-      <div className="min-h-screen flex flex-col" style={{ backgroundColor: '#F5F9FF' }}>
-        <div className="px-6 pt-6 pb-3 flex items-center justify-between">
-          <p className="text-sm text-gray-400 font-medium">{meta.icon} {meta.label}</p>
-          <div className="flex gap-2">
+      <div className="min-h-screen flex flex-col" style={{ backgroundColor: '#F0F7FF' }}>
+        <div className="px-6 pt-5 pb-3 flex items-center justify-between">
+          <div className="flex items-center gap-2 text-sm font-medium" style={{ color: '#003361' }}>
+            <span style={{ color: '#6491C0' }}>{meta.icon}</span>
+            {meta.label}
+          </div>
+          <div className="flex gap-1.5">
             {selectedExercises.map((_, i) => (
-              <div key={i} className="w-2.5 h-2.5 rounded-full transition-all duration-300"
+              <div key={i} className="w-2 h-2 rounded-full transition-all duration-300"
                 style={{
-                  backgroundColor: i < currentIndex ? '#4CAF50' : i === currentIndex ? '#003361' : '#D1DCE8',
+                  backgroundColor: i < currentIndex ? '#22c55e' : i === currentIndex ? '#003361' : '#C8D9EC',
                 }} />
             ))}
           </div>
         </div>
         <div className="flex-1 px-4 pb-6 overflow-auto">
-          <div className="bg-white rounded-2xl shadow-sm p-6 min-h-[calc(100vh-120px)]">
+          <div className="bg-white rounded-3xl shadow-sm p-6 min-h-[calc(100vh-100px)]">
             {renderExercise()}
           </div>
         </div>
@@ -203,33 +211,37 @@ export function ClientExerciseViewPage() {
     const done = completedExercises[completedExercises.length - 1];
     const nextMeta = EXERCISE_META[selectedExercises[currentIndex + 1]];
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center p-8" style={{ backgroundColor: '#F5F9FF' }}>
+      <div className="min-h-screen flex flex-col items-center justify-center p-8" style={{ backgroundColor: '#F0F7FF' }}>
         <div className="text-center max-w-sm w-full">
-          <div className="w-20 h-20 rounded-full flex items-center justify-center text-4xl mx-auto mb-6"
-            style={{ backgroundColor: '#E8F5E9' }}>
-            ✓
+          <div className="w-20 h-20 rounded-3xl flex items-center justify-center mx-auto mb-8"
+            style={{ backgroundColor: '#FEDC00' }}>
+            <CheckCircle weight="fill" className="w-10 h-10" style={{ color: '#003361' }} />
           </div>
-          <h2 className="text-2xl font-bold mb-2" style={{ color: '#003361' }}>Well done!</h2>
+          <h2 className="text-2xl font-bold mb-2 tracking-tight" style={{ color: '#003361', letterSpacing: '-0.02em' }}>
+            Well done!
+          </h2>
           {done && (
-            <p className="text-gray-500 text-lg mb-8">
-              {EXERCISE_META[done.exerciseType].label} complete
+            <p className="text-slate-500 text-base mb-8">
+              {EXERCISE_META[done.exerciseType].label} — complete
             </p>
           )}
           <div className="bg-white rounded-2xl p-5 shadow-sm mb-8">
-            <p className="text-4xl font-bold mb-1" style={{ color: '#003361' }}>
+            <p className="text-5xl font-bold mb-1 tracking-tight" style={{ color: '#003361', letterSpacing: '-0.02em' }}>
               {done?.finalScore ?? 0}
             </p>
-            <p className="text-sm text-gray-400">points scored</p>
+            <p className="text-sm text-slate-400">points this round</p>
           </div>
-          <p className="text-gray-400 text-sm mb-6">
-            Next: {nextMeta.icon} {nextMeta.label}
-          </p>
+          <div className="flex items-center justify-center gap-2 text-slate-400 text-sm mb-8">
+            <span>Next up:</span>
+            <span style={{ color: '#6491C0' }}>{nextMeta.icon}</span>
+            <span className="font-medium" style={{ color: '#003361' }}>{nextMeta.label}</span>
+          </div>
           <button
             onClick={handleContinue}
-            className="w-full py-5 rounded-2xl text-xl font-bold transition-transform active:scale-95"
+            className="w-full py-5 rounded-2xl text-lg font-semibold transition-transform active:scale-95 flex items-center justify-center gap-2"
             style={{ backgroundColor: '#003361', color: 'white' }}
           >
-            Continue
+            Continue <ArrowRight weight="bold" className="w-5 h-5" />
           </button>
         </div>
       </div>
@@ -240,32 +252,41 @@ export function ClientExerciseViewPage() {
   if (phase === 'done') {
     const totalScore = completedExercises.reduce((sum, ex) => sum + ex.finalScore, 0);
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center p-8" style={{ backgroundColor: '#F5F9FF' }}>
+      <div className="min-h-screen flex flex-col items-center justify-center p-8" style={{ backgroundColor: '#F0F7FF' }}>
         <div className="text-center max-w-sm w-full">
-          <div className="text-6xl mb-6">🌟</div>
-          <h2 className="text-3xl font-bold mb-3" style={{ color: '#003361' }}>Brilliant work!</h2>
-          <p className="text-gray-500 text-lg mb-2">
-            You completed all {selectedExercises.length} exercises.
-          </p>
-          <p className="text-gray-400 mb-8">
-            Total score: <strong style={{ color: '#003361' }}>{totalScore} points</strong>
-          </p>
-          <div className="bg-white rounded-2xl p-5 shadow-sm mb-8 text-left space-y-3">
-            {completedExercises.map((ex, i) => (
-              <div key={i} className="flex justify-between items-center text-sm">
-                <span className="text-gray-600">
-                  {EXERCISE_META[ex.exerciseType].icon} {EXERCISE_META[ex.exerciseType].label}
-                </span>
-                <span className="font-bold" style={{ color: '#003361' }}>{ex.finalScore} pts</span>
-              </div>
-            ))}
+          <div className="w-20 h-20 rounded-3xl flex items-center justify-center mx-auto mb-8"
+            style={{ backgroundColor: '#FEDC00' }}>
+            <Star weight="fill" className="w-10 h-10" style={{ color: '#003361' }} />
           </div>
-          <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 mb-6 text-sm text-amber-800">
+          <h2 className="text-3xl font-bold mb-3 tracking-tight" style={{ color: '#003361', letterSpacing: '-0.02em' }}>
+            Brilliant work!
+          </h2>
+          <p className="text-slate-500 text-lg mb-2 leading-relaxed">
+            You completed all {selectedExercises.length} exercises today.
+          </p>
+          <div className="bg-white rounded-2xl p-5 shadow-sm mb-6">
+            <p className="text-5xl font-bold mb-1 tracking-tight" style={{ color: '#003361', letterSpacing: '-0.02em' }}>
+              {totalScore}
+            </p>
+            <p className="text-sm text-slate-400 mb-5">total points</p>
+            <div className="space-y-3 text-left border-t border-slate-100 pt-4">
+              {completedExercises.map((ex, i) => (
+                <div key={i} className="flex justify-between items-center text-sm">
+                  <div className="flex items-center gap-2 text-slate-500">
+                    <span style={{ color: '#6491C0' }}>{EXERCISE_META[ex.exerciseType].icon}</span>
+                    {EXERCISE_META[ex.exerciseType].label}
+                  </div>
+                  <span className="font-semibold" style={{ color: '#003361' }}>{ex.finalScore} pts</span>
+                </div>
+              ))}
+            </div>
+          </div>
+          <p className="text-slate-400 text-sm mb-6">
             Please hand the device back to your therapist.
-          </div>
+          </p>
           <button
             onClick={handleFinish}
-            className="w-full py-5 rounded-2xl text-xl font-bold transition-transform active:scale-95"
+            className="w-full py-5 rounded-2xl text-lg font-semibold transition-transform active:scale-95"
             style={{ backgroundColor: '#003361', color: 'white' }}
           >
             Finish

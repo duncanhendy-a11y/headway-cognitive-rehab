@@ -4,8 +4,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/lib/supabase';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Users, Plus, Clock, Brain } from 'lucide-react';
+import { Users, Plus, Clock, Brain, Play, CaretRight } from '@phosphor-icons/react';
 import type { Client } from '@/types';
 import { AddClientDialog } from '@/components/AddClientDialog';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
@@ -25,7 +24,6 @@ export function DashboardPage() {
   const loadProfessionalAndClients = async () => {
     if (!user) return;
 
-    // Upsert professional record on first login
     const { data: prof, error: profErr } = await supabase
       .from('professionals')
       .upsert({ email: user.email!, full_name: user.email!.split('@')[0], auth_user_id: user.id }, { onConflict: 'email' })
@@ -61,7 +59,7 @@ export function DashboardPage() {
   if (loading) {
     return (
       <div className="p-8 flex items-center justify-center h-full">
-        <div className="text-headway-navy">Loading…</div>
+        <div className="text-slate-400 text-sm">Loading…</div>
       </div>
     );
   }
@@ -69,12 +67,12 @@ export function DashboardPage() {
   return (
     <div className="p-8 max-w-5xl mx-auto">
       {/* Header */}
-      <div className="flex items-start justify-between mb-8">
+      <div className="flex items-start justify-between mb-10">
         <div>
-          <h1 className="text-2xl font-bold text-headway-navy">
+          <h1 className="text-2xl font-bold tracking-tight" style={{ color: '#003361', letterSpacing: '-0.02em' }}>
             {greeting()}, {user?.email?.split('@')[0]}
           </h1>
-          <p className="text-gray-500 mt-1">
+          <p className="text-slate-400 mt-1 text-sm">
             {clients.length} active client{clients.length !== 1 ? 's' : ''}
           </p>
         </div>
@@ -82,10 +80,10 @@ export function DashboardPage() {
           <TooltipTrigger>
             <Button
               onClick={() => setShowAddClient(true)}
-              className="font-bold"
+              className="font-semibold gap-2"
               style={{ backgroundColor: '#003361', color: 'white' }}
             >
-              <Plus className="w-4 h-4 mr-2" />
+              <Plus weight="bold" className="w-4 h-4" />
               Add client
             </Button>
           </TooltipTrigger>
@@ -94,57 +92,59 @@ export function DashboardPage() {
       </div>
 
       {/* Summary cards */}
-      <div className="grid grid-cols-3 gap-4 mb-8">
-        <Card className="border-0 shadow-sm">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-gray-500 flex items-center gap-2">
-              <Users className="w-4 h-4" /> Active clients
+      <div className="grid grid-cols-3 gap-4 mb-10">
+        <Card className="border-0 shadow-sm rounded-2xl bg-white">
+          <CardHeader className="pb-1 pt-5 px-5">
+            <CardTitle className="text-xs font-medium text-slate-400 flex items-center gap-1.5 uppercase tracking-wide">
+              <Users className="w-3.5 h-3.5" /> Active clients
             </CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold text-headway-navy">{clients.length}</div>
+          <CardContent className="px-5 pb-5">
+            <div className="text-4xl font-bold tracking-tight" style={{ color: '#003361', letterSpacing: '-0.02em' }}>{clients.length}</div>
           </CardContent>
         </Card>
-        <Card className="border-0 shadow-sm">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-gray-500 flex items-center gap-2">
-              <Clock className="w-4 h-4" /> Sessions today
+        <Card className="border-0 shadow-sm rounded-2xl bg-white">
+          <CardHeader className="pb-1 pt-5 px-5">
+            <CardTitle className="text-xs font-medium text-slate-400 flex items-center gap-1.5 uppercase tracking-wide">
+              <Clock className="w-3.5 h-3.5" /> Sessions today
             </CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold text-headway-navy">—</div>
+          <CardContent className="px-5 pb-5">
+            <div className="text-4xl font-bold tracking-tight text-slate-300" style={{ letterSpacing: '-0.02em' }}>—</div>
           </CardContent>
         </Card>
-        <Card className="border-0 shadow-sm">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-gray-500 flex items-center gap-2">
-              <Brain className="w-4 h-4" /> Insights pending
+        <Card className="border-0 shadow-sm rounded-2xl bg-white">
+          <CardHeader className="pb-1 pt-5 px-5">
+            <CardTitle className="text-xs font-medium text-slate-400 flex items-center gap-1.5 uppercase tracking-wide">
+              <Brain className="w-3.5 h-3.5" /> Insights pending
             </CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold text-headway-navy">—</div>
+          <CardContent className="px-5 pb-5">
+            <div className="text-4xl font-bold tracking-tight text-slate-300" style={{ letterSpacing: '-0.02em' }}>—</div>
           </CardContent>
         </Card>
       </div>
 
       {/* Client roster */}
       <div>
-        <h2 className="text-lg font-bold text-headway-navy mb-4">Your clients</h2>
+        <div className="flex items-center justify-between mb-5">
+          <h2 className="text-base font-semibold" style={{ color: '#003361' }}>Your clients</h2>
+        </div>
 
         {clients.length === 0 ? (
-          <Card className="border-dashed border-2 border-gray-200 shadow-none">
+          <Card className="border-dashed border-2 border-slate-200 shadow-none bg-transparent rounded-2xl">
             <CardContent className="py-16 text-center">
-              <Users className="w-12 h-12 text-gray-300 mx-auto mb-4" />
-              <p className="text-gray-500 font-medium mb-1">No clients yet</p>
-              <p className="text-gray-400 text-sm mb-5">
-                Add your first client to start a session.
-              </p>
+              <div className="w-12 h-12 rounded-2xl flex items-center justify-center mx-auto mb-4" style={{ backgroundColor: '#E8F0F8' }}>
+                <Users className="w-6 h-6" style={{ color: '#6491C0' }} />
+              </div>
+              <p className="text-slate-600 font-semibold mb-1">No clients yet</p>
+              <p className="text-slate-400 text-sm mb-5">Add your first client to start a session.</p>
               <Button
                 onClick={() => setShowAddClient(true)}
                 style={{ backgroundColor: '#003361', color: 'white' }}
-                className="font-bold"
+                className="font-semibold gap-2"
               >
-                <Plus className="w-4 h-4 mr-2" />
+                <Plus weight="bold" className="w-4 h-4" />
                 Add first client
               </Button>
             </CardContent>
@@ -154,33 +154,31 @@ export function DashboardPage() {
             {clients.map(client => (
               <Card
                 key={client.id}
-                className="border-0 shadow-sm hover:shadow-md transition-shadow cursor-pointer group"
+                className="border-0 shadow-sm hover:shadow-md transition-all rounded-2xl bg-white cursor-pointer group"
                 onClick={() => navigate(`/clients/${client.id}`)}
               >
                 <CardContent className="p-5">
-                  <div className="flex items-start justify-between mb-3">
-                    <div className="w-10 h-10 rounded-full flex items-center justify-center font-bold text-white text-sm flex-shrink-0"
-                      style={{ backgroundColor: '#6491C0' }}>
+                  <div className="flex items-start justify-between mb-4">
+                    <div className="w-10 h-10 rounded-xl flex items-center justify-center font-bold text-white text-sm flex-shrink-0"
+                      style={{ backgroundColor: '#003361' }}>
                       {client.identifier.slice(0, 2).toUpperCase()}
                     </div>
-                    <Badge variant="outline" className="text-xs text-gray-400 border-gray-200">
-                      Active
-                    </Badge>
+                    <CaretRight className="w-4 h-4 text-slate-300 group-hover:text-slate-400 transition-colors mt-1" />
                   </div>
-                  <p className="font-semibold text-headway-navy truncate">{client.identifier}</p>
-                  <p className="text-xs text-gray-400 mt-1">
+                  <p className="font-semibold truncate mb-1" style={{ color: '#003361' }}>{client.identifier}</p>
+                  <p className="text-xs text-slate-400 mb-4">
                     Added {new Date(client.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}
                   </p>
                   <Button
                     size="sm"
-                    className="w-full mt-4 text-xs font-bold opacity-0 group-hover:opacity-100 transition-opacity"
+                    className="w-full text-xs font-semibold gap-1.5 opacity-0 group-hover:opacity-100 transition-all"
                     style={{ backgroundColor: '#FEDC00', color: '#003361' }}
                     onClick={(e: React.MouseEvent) => {
                       e.stopPropagation();
                       navigate('/session/setup', { state: { clientId: client.id, clientIdentifier: client.identifier, professionalId } });
                     }}
                   >
-                    Start session
+                    <Play weight="fill" className="w-3 h-3" /> Start session
                   </Button>
                 </CardContent>
               </Card>

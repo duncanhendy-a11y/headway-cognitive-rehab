@@ -5,8 +5,7 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        sans: ['"Tex Gyre Heros"', 'Arimo', 'sans-serif'],
-        condensed: ['"Tex Gyre Heros Condensed"', 'Arimo Condensed', 'sans-serif'],
+        sans: ['Inter', 'system-ui', 'sans-serif'],
       },
       colors: {
         // Headway brand palette — extracted from headway.org.uk live CSS
