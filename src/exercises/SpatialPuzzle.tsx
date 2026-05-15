@@ -18,7 +18,7 @@ const getDifficultySettings = (difficulty: Difficulty) => {
 export function SpatialPuzzle({ difficulty, onComplete, onScoreUpdate }: SpatialPuzzleProps) {
   const [tiles, setTiles] = useState<number[]>([]);
   const [moves, setMoves] = useState(0);
-  const [score, setScore] = useState(0);
+  const [_score, setScore] = useState(0);
   const size = getDifficultySettings(difficulty).size;
   const totalTiles = size * size;
 

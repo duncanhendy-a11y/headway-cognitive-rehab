@@ -1,5 +1,4 @@
 import { ArrowLeft } from 'lucide-react';
-import { ExerciseType } from '../types';
 
 interface ExerciseContainerProps {
   title: string;

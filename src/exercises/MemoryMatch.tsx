@@ -29,7 +29,7 @@ export function MemoryMatch({ difficulty, onComplete, onScoreUpdate }: MemoryMat
   const [flippedCards, setFlippedCards] = useState<number[]>([]);
   const [moves, setMoves] = useState(0);
   const [matches, setMatches] = useState(0);
-  const [score, setScore] = useState(0);
+  const [_score, setScore] = useState(0);
 
   const settings = getDifficultySettings(difficulty);
   const totalPairs = settings.pairs;

@@ -1,130 +1,54 @@
-import { useState } from 'react';
-import { Header } from './components/Header';
-import { ExerciseMenu } from './components/ExerciseMenu';
-import { ExerciseContainer } from './components/ExerciseContainer';
-import { StatsModal } from './components/StatsModal';
-import { CompletionModal } from './components/CompletionModal';
-import { MemoryMatch } from './exercises/MemoryMatch';
-import { PatternRecognition } from './exercises/PatternRecognition';
-import { SequenceRecall } from './exercises/SequenceRecall';
-import { WordGames } from './exercises/WordGames';
-import { SpatialPuzzle } from './exercises/SpatialPuzzle';
-import { FocusChallenge } from './exercises/FocusChallenge';
-import { Difficulty, ExerciseType } from './types';
-import { getStats, updateStats } from './utils/storage';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { AuthProvider } from '@/contexts/AuthContext';
+import { ProtectedRoute } from '@/components/ProtectedRoute';
+import { AppLayout } from '@/components/layout/AppLayout';
+import { LoginPage } from '@/pages/LoginPage';
+import { DashboardPage } from '@/pages/DashboardPage';
+import { ClientProfilePage } from '@/pages/ClientProfilePage';
+import { SessionSetupPage } from '@/pages/SessionSetupPage';
+import { ClientExerciseViewPage } from '@/pages/ClientExerciseViewPage';
+import { PostSessionNotesPage } from '@/pages/PostSessionNotesPage';
+import { SessionReportPage } from '@/pages/SessionReportPage';
+import { HelpPage } from '@/pages/HelpPage';
+import { Toaster } from '@/components/ui/sonner';
 
-const exerciseTitles: Record<ExerciseType, string> = {
-  memory: 'Memory Match',
-  pattern: 'Pattern Recognition',
-  sequence: 'Sequence Recall',
-  word: 'Word Games',
-  spatial: 'Spatial Puzzle',
-  attention: 'Focus Challenge',
-};
-
-function App() {
-  const [difficulty, setDifficulty] = useState<Difficulty>('easy');
-  const [currentExercise, setCurrentExercise] = useState<ExerciseType | null>(null);
-  const [score, setScore] = useState(0);
-  const [showStats, setShowStats] = useState(false);
-  const [showCompletion, setShowCompletion] = useState(false);
-  const [completionScore, setCompletionScore] = useState(0);
-
-  const handleSelectExercise = (exercise: ExerciseType) => {
-    setCurrentExercise(exercise);
-    setScore(0);
-  };
-
-  const handleBackToMenu = () => {
-    setCurrentExercise(null);
-    setScore(0);
-  };
-
-  const handleComplete = (finalScore: number) => {
-    if (currentExercise) {
-      updateStats(currentExercise, finalScore);
-    }
-    setCompletionScore(finalScore);
-    setShowCompletion(true);
-  };
-
-  const handleTryAgain = () => {
-    setShowCompletion(false);
-    setScore(0);
-  };
-
-  const handleCompletionBackToMenu = () => {
-    setShowCompletion(false);
-    setCurrentExercise(null);
-    setScore(0);
-  };
-
-  const handleScoreUpdate = (newScore: number) => {
-    setScore(newScore);
-  };
-
-  const renderExercise = () => {
-    if (!currentExercise) return null;
-
-    const props = {
-      difficulty,
-      onComplete: handleComplete,
-      onScoreUpdate: handleScoreUpdate,
-    };
-
-    switch (currentExercise) {
-      case 'memory':
-        return <MemoryMatch {...props} />;
-      case 'pattern':
-        return <PatternRecognition {...props} />;
-      case 'sequence':
-        return <SequenceRecall {...props} />;
-      case 'word':
-        return <WordGames {...props} />;
-      case 'spatial':
-        return <SpatialPuzzle {...props} />;
-      case 'attention':
-        return <FocusChallenge {...props} />;
-      default:
-        return null;
-    }
-  };
-
+export default function App() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
-      <Header
-        difficulty={difficulty}
-        onDifficultyChange={setDifficulty}
-        onStatsClick={() => setShowStats(true)}
-      />
+    <AuthProvider>
+      <BrowserRouter>
+        <Routes>
+          <Route path="/login" element={<LoginPage />} />
 
-      {currentExercise ? (
-        <ExerciseContainer
-          title={exerciseTitles[currentExercise]}
-          score={score}
-          onBack={handleBackToMenu}
-        >
-          {renderExercise()}
-        </ExerciseContainer>
-      ) : (
-        <ExerciseMenu onSelectExercise={handleSelectExercise} />
-      )}
+          {/* All professional routes are protected and use the AppLayout shell */}
+          <Route path="/" element={
+            <ProtectedRoute>
+              <AppLayout />
+            </ProtectedRoute>
+          }>
+            <Route index element={<Navigate to="/dashboard" replace />} />
+            <Route path="dashboard" element={<DashboardPage />} />
+            <Route path="clients/:clientId" element={<ClientProfilePage />} />
+            <Route path="session/setup" element={<SessionSetupPage />} />
+            <Route path="session/:sessionId/report" element={<SessionReportPage />} />
+            <Route path="help" element={<HelpPage />} />
+          </Route>
 
-      <StatsModal
-        isOpen={showStats}
-        stats={getStats()}
-        onClose={() => setShowStats(false)}
-      />
+          {/* Client-facing routes — no AppLayout, full-screen isolation */}
+          <Route path="/session/exercise" element={
+            <ProtectedRoute>
+              <ClientExerciseViewPage />
+            </ProtectedRoute>
+          } />
+          <Route path="/session/notes" element={
+            <ProtectedRoute>
+              <PostSessionNotesPage />
+            </ProtectedRoute>
+          } />
 
-      <CompletionModal
-        isOpen={showCompletion}
-        message="You completed the exercise!"
-        score={completionScore}
-        onTryAgain={handleTryAgain}
-        onBackToMenu={handleCompletionBackToMenu}
-      />
-    </div>
+          <Route path="*" element={<Navigate to="/dashboard" replace />} />
+        </Routes>
+      </BrowserRouter>
+      <Toaster richColors position="top-right" />
+    </AuthProvider>
   );
 }
-
-export default App;
