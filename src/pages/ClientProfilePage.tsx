@@ -176,7 +176,7 @@ export function ClientProfilePage() {
           </div>
           <div className="text-center">
             <p className="text-lg font-bold text-white">
-              {lastSession ? new Date(lastSession.started_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }) : '—'}
+              {lastSession ? new Date(lastSession.started_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }) : 'None yet'}
             </p>
             <p className="text-blue-300 text-xs mt-0.5">last session</p>
           </div>

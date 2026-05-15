@@ -65,7 +65,7 @@ export function AddClientDialog({ open, professionalId, onClose, onClientAdded }
               required
             />
             <p className="text-xs text-gray-400">
-              This is the only information stored — no dates of birth, medical history, or contact details.
+              This is the only information stored. No dates of birth, medical history, or contact details.
             </p>
           </div>
           <div className="flex gap-3">

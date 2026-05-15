@@ -5,42 +5,6 @@
 @tailwind components;
 @tailwind utilities;
 
-/* ── Tex Gyre Heros (Headway's actual font, SIL OFL licence) ─────────────── */
-@font-face {
-  font-family: 'Tex Gyre Heros';
-  src: url('/fonts/texgyreheros-regular.otf') format('opentype');
-  font-weight: 400;
-  font-style: normal;
-  font-display: swap;
-}
-@font-face {
-  font-family: 'Tex Gyre Heros';
-  src: url('/fonts/texgyreheros-italic.otf') format('opentype');
-  font-weight: 400;
-  font-style: italic;
-  font-display: swap;
-}
-@font-face {
-  font-family: 'Tex Gyre Heros';
-  src: url('/fonts/texgyreheros-bold.otf') format('opentype');
-  font-weight: 700;
-  font-style: normal;
-  font-display: swap;
-}
-@font-face {
-  font-family: 'Tex Gyre Heros';
-  src: url('/fonts/texgyreheros-bolditalic.otf') format('opentype');
-  font-weight: 700;
-  font-style: italic;
-  font-display: swap;
-}
-@font-face {
-  font-family: 'Tex Gyre Heros Condensed';
-  src: url('/fonts/texgyreheroscn-bold.otf') format('opentype');
-  font-weight: 700;
-  font-style: normal;
-  font-display: swap;
-}
 
 @layer base {
   :root {
@@ -98,16 +62,17 @@
   * {
     @apply border-border outline-ring/50;
   }
+  html {
+    font-family: 'Inter', system-ui, sans-serif;
+    font-size: 17px;
+  }
   body {
     @apply bg-background text-foreground;
-    font-family: 'Tex Gyre Heros', Arimo, sans-serif;
+    font-family: 'Inter', system-ui, sans-serif;
     color: #333333;
   }
-  html {
-    font-family: 'Tex Gyre Heros', Arimo, sans-serif;
-  }
   h1, h2, h3, h4, h5, h6 {
-    font-family: 'Tex Gyre Heros', Arimo, sans-serif;
+    font-family: 'Inter', system-ui, sans-serif;
     font-weight: 700;
   }
 }

@@ -87,7 +87,7 @@ export function DashboardPage() {
               Add client
             </Button>
           </TooltipTrigger>
-          <TooltipContent>Create a new client profile — identifier only, no personal data stored</TooltipContent>
+          <TooltipContent>Create a new client profile. Identifier only, no personal data stored.</TooltipContent>
         </Tooltip>
       </div>
 
@@ -110,7 +110,7 @@ export function DashboardPage() {
             </CardTitle>
           </CardHeader>
           <CardContent className="px-5 pb-5">
-            <div className="text-4xl font-bold tracking-tight text-slate-300" style={{ letterSpacing: '-0.02em' }}>—</div>
+            <div className="text-4xl font-bold tracking-tight text-slate-300" style={{ letterSpacing: '-0.02em' }}>0</div>
           </CardContent>
         </Card>
         <Card className="border-0 shadow-sm rounded-2xl bg-white">
@@ -120,7 +120,7 @@ export function DashboardPage() {
             </CardTitle>
           </CardHeader>
           <CardContent className="px-5 pb-5">
-            <div className="text-4xl font-bold tracking-tight text-slate-300" style={{ letterSpacing: '-0.02em' }}>—</div>
+            <div className="text-4xl font-bold tracking-tight text-slate-300" style={{ letterSpacing: '-0.02em' }}>0</div>
           </CardContent>
         </Card>
       </div>

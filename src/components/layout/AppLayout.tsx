@@ -104,8 +104,8 @@ export function AppLayout() {
             </TooltipTrigger>
             <TooltipContent side="right">
               {isOnline
-                ? 'Connected — all session data is being saved'
-                : 'No connection — reconnect before starting a new session'
+                ? 'Connected. All session data is being saved.'
+                : 'No connection. Reconnect before starting a new session.'
               }
             </TooltipContent>
           </Tooltip>

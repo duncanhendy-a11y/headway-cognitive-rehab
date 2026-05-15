@@ -165,7 +165,7 @@ export function ClientExerciseViewPage() {
           <p className="text-slate-500 text-lg mb-2 leading-relaxed">
             Your therapist has set up {selectedExercises.length} exercise{selectedExercises.length !== 1 ? 's' : ''} for you today.
           </p>
-          <p className="text-slate-400 mb-10">Take your time — there is no rush at all.</p>
+          <p className="text-slate-400 mb-10">Take your time. There is no rush at all.</p>
           <button
             onClick={handleStart}
             className="w-full py-5 rounded-2xl text-lg font-semibold transition-transform active:scale-95 flex items-center justify-center gap-2"
@@ -222,7 +222,7 @@ export function ClientExerciseViewPage() {
           </h2>
           {done && (
             <p className="text-slate-500 text-base mb-8">
-              {EXERCISE_META[done.exerciseType].label} — complete
+              {EXERCISE_META[done.exerciseType].label} complete
             </p>
           )}
           <div className="bg-white rounded-2xl p-5 shadow-sm mb-8">
