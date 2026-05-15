@@ -2,6 +2,7 @@ import { Outlet, NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -86,12 +87,22 @@ export function AppLayout() {
 
         {/* Connectivity indicator */}
         <div className="px-5 py-3 border-t border-blue-900">
-          <div className={`flex items-center gap-2 text-xs ${isOnline ? 'text-green-300' : 'text-amber-300'}`}>
-            {isOnline
-              ? <><Wifi className="w-3 h-3" /> Online</>
-              : <><WifiOff className="w-3 h-3" /> Offline — data will sync</>
-            }
-          </div>
+          <Tooltip>
+            <TooltipTrigger>
+              <div className={`flex items-center gap-2 text-xs cursor-default ${isOnline ? 'text-green-300' : 'text-amber-300'}`}>
+                {isOnline
+                  ? <><Wifi className="w-3 h-3" /> Online</>
+                  : <><WifiOff className="w-3 h-3" /> Offline — data will sync</>
+                }
+              </div>
+            </TooltipTrigger>
+            <TooltipContent side="right">
+              {isOnline
+                ? 'Connected — all session data is being saved to the server'
+                : 'No connection — reconnect before starting a new session'
+              }
+            </TooltipContent>
+          </Tooltip>
         </div>
 
         {/* User menu */}

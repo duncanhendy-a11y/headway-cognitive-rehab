@@ -7,6 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { ArrowLeft, Play, Brain, ClipboardList, Lightbulb, Calendar, Clock, TrendingUp } from 'lucide-react';
 import { DomainRadarChart } from '@/components/DomainRadarChart';
 import { EditClientDialog } from '@/components/EditClientDialog';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { useState } from 'react';
 import type { Session, AiInsight } from '@/types';
 
@@ -166,15 +167,25 @@ export function ClientProfilePage() {
             <p className="text-blue-300 text-xs">last session</p>
           </div>
           <div className="flex gap-2">
-            <Button size="sm" variant="outline" onClick={() => setShowEdit(true)}
-              className="text-white border-blue-400 hover:bg-blue-900 bg-transparent">
-              Edit
-            </Button>
-            <Button size="sm"
-              onClick={() => navigate('/session/setup', { state: { clientId: client.id, clientIdentifier: client.identifier } })}
-              className="font-bold" style={{ backgroundColor: '#FEDC00', color: '#003361' }}>
-              <Play className="w-3.5 h-3.5 mr-1.5" /> Start session
-            </Button>
+            <Tooltip>
+              <TooltipTrigger>
+                <Button size="sm" variant="outline" onClick={() => setShowEdit(true)}
+                  className="text-white border-blue-400 hover:bg-blue-900 bg-transparent">
+                  Edit
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>Edit client name or remove from your list</TooltipContent>
+            </Tooltip>
+            <Tooltip>
+              <TooltipTrigger>
+                <Button size="sm"
+                  onClick={() => navigate('/session/setup', { state: { clientId: client.id, clientIdentifier: client.identifier } })}
+                  className="font-bold" style={{ backgroundColor: '#FEDC00', color: '#003361' }}>
+                  <Play className="w-3.5 h-3.5 mr-1.5" /> Start session
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>Set up exercises, hand to client, and begin recording</TooltipContent>
+            </Tooltip>
           </div>
         </div>
       </div>

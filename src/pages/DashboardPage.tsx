@@ -8,6 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { Users, Plus, Clock, Brain } from 'lucide-react';
 import type { Client } from '@/types';
 import { AddClientDialog } from '@/components/AddClientDialog';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 
 export function DashboardPage() {
   const { user } = useAuth();
@@ -77,14 +78,19 @@ export function DashboardPage() {
             {clients.length} active client{clients.length !== 1 ? 's' : ''}
           </p>
         </div>
-        <Button
-          onClick={() => setShowAddClient(true)}
-          className="font-bold"
-          style={{ backgroundColor: '#003361', color: 'white' }}
-        >
-          <Plus className="w-4 h-4 mr-2" />
-          Add client
-        </Button>
+        <Tooltip>
+          <TooltipTrigger>
+            <Button
+              onClick={() => setShowAddClient(true)}
+              className="font-bold"
+              style={{ backgroundColor: '#003361', color: 'white' }}
+            >
+              <Plus className="w-4 h-4 mr-2" />
+              Add client
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>Create a new client profile — identifier only, no personal data stored</TooltipContent>
+        </Tooltip>
       </div>
 
       {/* Summary cards */}
