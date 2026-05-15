@@ -1,10 +1,12 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Difficulty } from '../types';
+import type { RoundTelemetry } from '../types';
 
 interface SpatialPuzzleProps {
   difficulty: Difficulty;
   onComplete: (score: number) => void;
   onScoreUpdate: (score: number) => void;
+  onRoundComplete?: (telemetry: RoundTelemetry) => void;
 }
 
 const getDifficultySettings = (difficulty: Difficulty) => {
@@ -15,16 +17,16 @@ const getDifficultySettings = (difficulty: Difficulty) => {
   }
 };
 
-export function SpatialPuzzle({ difficulty, onComplete, onScoreUpdate }: SpatialPuzzleProps) {
+export function SpatialPuzzle({ difficulty, onComplete, onScoreUpdate, onRoundComplete }: SpatialPuzzleProps) {
   const [tiles, setTiles] = useState<number[]>([]);
   const [moves, setMoves] = useState(0);
   const [_score, setScore] = useState(0);
   const size = getDifficultySettings(difficulty).size;
   const totalTiles = size * size;
+  const puzzleStartRef = useRef<string>(new Date().toISOString());
+  const puzzleStartMsRef = useRef<number>(Date.now());
 
-  useEffect(() => {
-    initPuzzle();
-  }, [difficulty]);
+  useEffect(() => { initPuzzle(); }, [difficulty]);
 
   useEffect(() => {
     const currentScore = Math.max(100 - moves * 2, 0);
@@ -35,51 +37,57 @@ export function SpatialPuzzle({ difficulty, onComplete, onScoreUpdate }: Spatial
   const initPuzzle = () => {
     const solved = Array.from({ length: totalTiles }, (_, i) => i);
     const shuffled = [...solved];
-
     for (let i = 0; i < 100; i++) {
       const emptyIndex = shuffled.indexOf(0);
       const validMoves = getValidMoves(emptyIndex);
       const randomMove = validMoves[Math.floor(Math.random() * validMoves.length)];
       [shuffled[emptyIndex], shuffled[randomMove]] = [shuffled[randomMove], shuffled[emptyIndex]];
     }
-
     setTiles(shuffled);
     setMoves(0);
+    puzzleStartRef.current = new Date().toISOString();
+    puzzleStartMsRef.current = Date.now();
   };
 
   const getValidMoves = (emptyIndex: number) => {
     const moves = [];
     const row = Math.floor(emptyIndex / size);
     const col = emptyIndex % size;
-
     if (row > 0) moves.push(emptyIndex - size);
     if (row < size - 1) moves.push(emptyIndex + size);
     if (col > 0) moves.push(emptyIndex - 1);
     if (col < size - 1) moves.push(emptyIndex + 1);
-
     return moves;
   };
 
   const handleTileClick = (index: number) => {
     const emptyIndex = tiles.indexOf(0);
     const validMoves = getValidMoves(emptyIndex);
-
     if (validMoves.includes(index)) {
       const newTiles = [...tiles];
       [newTiles[emptyIndex], newTiles[index]] = [newTiles[index], newTiles[emptyIndex]];
       setTiles(newTiles);
-      setMoves(moves + 1);
-
+      const newMoves = moves + 1;
+      setMoves(newMoves);
       if (isSolved(newTiles)) {
-        const score = Math.max(100 - moves, 10);
-        setTimeout(() => onComplete(score), 500);
+        const finalScore = Math.max(100 - newMoves, 10);
+        const completedAt = new Date().toISOString();
+        onRoundComplete?.({
+          round_number: 1,
+          score: finalScore,
+          errors: newMoves,
+          response_time_ms: Date.now() - puzzleStartMsRef.current,
+          started_at: puzzleStartRef.current,
+          completed_at: completedAt,
+          metadata: { grid_size: size, moves: newMoves },
+        });
+        setTimeout(() => onComplete(finalScore), 500);
       }
     }
   };
 
-  const isSolved = (currentTiles: number[]) => {
-    return currentTiles.every((tile, index) => tile === index);
-  };
+  const isSolved = (currentTiles: number[]) =>
+    currentTiles.every((tile, index) => tile === index);
 
   return (
     <div className="max-w-2xl mx-auto">
@@ -94,10 +102,7 @@ export function SpatialPuzzle({ difficulty, onComplete, onScoreUpdate }: Spatial
 
       <div
         className="grid gap-2 mx-auto"
-        style={{
-          gridTemplateColumns: `repeat(${size}, 1fr)`,
-          maxWidth: `${size * 100}px`
-        }}
+        style={{ gridTemplateColumns: `repeat(${size}, 1fr)`, maxWidth: `${size * 100}px` }}
       >
         {tiles.map((tile, index) => (
           <button

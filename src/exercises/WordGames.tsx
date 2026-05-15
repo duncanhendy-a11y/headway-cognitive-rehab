@@ -1,10 +1,12 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Difficulty } from '../types';
+import type { RoundTelemetry } from '../types';
 
 interface WordGamesProps {
   difficulty: Difficulty;
   onComplete: (score: number) => void;
   onScoreUpdate: (score: number) => void;
+  onRoundComplete?: (telemetry: RoundTelemetry) => void;
 }
 
 const categories = {
@@ -22,7 +24,7 @@ const getDifficultySettings = (difficulty: Difficulty) => {
   }
 };
 
-export function WordGames({ difficulty, onComplete, onScoreUpdate }: WordGamesProps) {
+export function WordGames({ difficulty, onComplete, onScoreUpdate, onRoundComplete }: WordGamesProps) {
   const [category, setCategory] = useState('');
   const [targetWords, setTargetWords] = useState<string[]>([]);
   const [allWords, setAllWords] = useState<string[]>([]);
@@ -31,21 +33,16 @@ export function WordGames({ difficulty, onComplete, onScoreUpdate }: WordGamesPr
   const [round, setRound] = useState(1);
   const [score, setScore] = useState(0);
   const [message, setMessage] = useState('Memorize these words...');
+  const inputStartRef = useRef<string>(new Date().toISOString());
 
   const settings = getDifficultySettings(difficulty);
 
-  useEffect(() => {
-    startNewRound();
-  }, [difficulty]);
-
-  useEffect(() => {
-    onScoreUpdate(score);
-  }, [score]);
+  useEffect(() => { startNewRound(); }, [difficulty]);
+  useEffect(() => { onScoreUpdate(score); }, [score]);
 
   const startNewRound = () => {
     const categoryName = Object.keys(categories)[Math.floor(Math.random() * Object.keys(categories).length)] as keyof typeof categories;
     const categoryWords = categories[categoryName];
-
     const shuffled = [...categoryWords].sort(() => Math.random() - 0.5);
     const targets = shuffled.slice(0, settings.words);
     const distractors = shuffled.slice(settings.words, settings.words * 2);
@@ -61,34 +58,38 @@ export function WordGames({ difficulty, onComplete, onScoreUpdate }: WordGamesPr
     setTimeout(() => {
       setIsShowing(false);
       setMessage(`Select the ${categoryName.toLowerCase()} you saw:`);
+      inputStartRef.current = new Date().toISOString();
     }, settings.showTime);
   };
 
   const handleWordClick = (word: string) => {
     if (isShowing) return;
-
-    if (selectedWords.includes(word)) {
-      setSelectedWords(selectedWords.filter(w => w !== word));
-    } else {
-      setSelectedWords([...selectedWords, word]);
-    }
+    setSelectedWords(prev =>
+      prev.includes(word) ? prev.filter(w => w !== word) : [...prev, word]
+    );
   };
 
   const handleSubmit = () => {
     const correct = selectedWords.filter(w => targetWords.includes(w)).length;
     const incorrect = selectedWords.filter(w => !targetWords.includes(w)).length;
-    const roundScore = (correct * 10) - (incorrect * 5);
+    const roundScore = Math.max((correct * 10) - (incorrect * 5), 0);
+
+    onRoundComplete?.({
+      round_number: round,
+      score: roundScore,
+      errors: incorrect,
+      response_time_ms: null,
+      started_at: inputStartRef.current,
+      completed_at: new Date().toISOString(),
+      metadata: { category, target_count: targetWords.length, correct, incorrect },
+    });
 
     setScore(score + roundScore);
     setMessage(`You got ${correct}/${targetWords.length} correct!`);
 
     setTimeout(() => {
-      if (round < settings.rounds) {
-        setRound(round + 1);
-        startNewRound();
-      } else {
-        onComplete(score + roundScore);
-      }
+      if (round < settings.rounds) { setRound(round + 1); startNewRound(); }
+      else { onComplete(score + roundScore); }
     }, 2000);
   };
 
@@ -106,10 +107,7 @@ export function WordGames({ difficulty, onComplete, onScoreUpdate }: WordGamesPr
           <h3 className="text-3xl font-bold text-white text-center mb-6">{category}</h3>
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
             {targetWords.map((word, index) => (
-              <div
-                key={index}
-                className="bg-white rounded-xl p-6 text-center text-2xl font-bold text-purple-900"
-              >
+              <div key={index} className="bg-white rounded-xl p-6 text-center text-2xl font-bold text-purple-900">
                 {word}
               </div>
             ))}
@@ -132,7 +130,6 @@ export function WordGames({ difficulty, onComplete, onScoreUpdate }: WordGamesPr
               </button>
             ))}
           </div>
-
           <button
             onClick={handleSubmit}
             className="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-4 px-6 rounded-xl text-xl transition-colors focus:outline-none focus:ring-4 focus:ring-green-300"

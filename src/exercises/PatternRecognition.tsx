@@ -1,10 +1,12 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Difficulty } from '../types';
+import type { RoundTelemetry } from '../types';
 
 interface PatternRecognitionProps {
   difficulty: Difficulty;
   onComplete: (score: number) => void;
   onScoreUpdate: (score: number) => void;
+  onRoundComplete?: (telemetry: RoundTelemetry) => void;
 }
 
 const colors = ['bg-red-500', 'bg-blue-500', 'bg-green-500', 'bg-yellow-500', 'bg-purple-500', 'bg-pink-500'];
@@ -17,7 +19,7 @@ const getDifficultySettings = (difficulty: Difficulty) => {
   }
 };
 
-export function PatternRecognition({ difficulty, onComplete, onScoreUpdate }: PatternRecognitionProps) {
+export function PatternRecognition({ difficulty, onComplete, onScoreUpdate, onRoundComplete }: PatternRecognitionProps) {
   const [pattern, setPattern] = useState<number[]>([]);
   const [userPattern, setUserPattern] = useState<number[]>([]);
   const [isShowing, setIsShowing] = useState(true);
@@ -25,16 +27,12 @@ export function PatternRecognition({ difficulty, onComplete, onScoreUpdate }: Pa
   const [round, setRound] = useState(1);
   const [score, setScore] = useState(0);
   const [message, setMessage] = useState('Watch the pattern...');
+  const roundStartRef = useRef<string>(new Date().toISOString());
 
   const settings = getDifficultySettings(difficulty);
 
-  useEffect(() => {
-    startNewRound();
-  }, [difficulty]);
-
-  useEffect(() => {
-    onScoreUpdate(score);
-  }, [score]);
+  useEffect(() => { startNewRound(); }, [difficulty]);
+  useEffect(() => { onScoreUpdate(score); }, [score]);
 
   const startNewRound = () => {
     const newPattern = Array.from({ length: settings.length }, () =>
@@ -45,6 +43,7 @@ export function PatternRecognition({ difficulty, onComplete, onScoreUpdate }: Pa
     setIsShowing(true);
     setCurrentIndex(-1);
     setMessage('Watch the pattern...');
+    roundStartRef.current = new Date().toISOString();
     showPattern(newPattern);
   };
 
@@ -66,30 +65,31 @@ export function PatternRecognition({ difficulty, onComplete, onScoreUpdate }: Pa
     setUserPattern(newUserPattern);
 
     if (newUserPattern[newUserPattern.length - 1] !== pattern[newUserPattern.length - 1]) {
+      onRoundComplete?.({
+        round_number: round, score: 0, errors: 1, response_time_ms: null,
+        started_at: roundStartRef.current, completed_at: new Date().toISOString(),
+        metadata: { pattern_length: settings.length },
+      });
       setMessage('Incorrect! Try the next round.');
       setTimeout(() => {
-        if (round < settings.rounds) {
-          setRound(round + 1);
-          startNewRound();
-        } else {
-          onComplete(score);
-        }
+        if (round < settings.rounds) { setRound(round + 1); startNewRound(); }
+        else { onComplete(score); }
       }, 1500);
       return;
     }
 
     if (newUserPattern.length === pattern.length) {
       const roundScore = 20;
+      onRoundComplete?.({
+        round_number: round, score: roundScore, errors: 0, response_time_ms: null,
+        started_at: roundStartRef.current, completed_at: new Date().toISOString(),
+        metadata: { pattern_length: settings.length },
+      });
       setScore(score + roundScore);
       setMessage('Correct! Well done!');
-
       setTimeout(() => {
-        if (round < settings.rounds) {
-          setRound(round + 1);
-          startNewRound();
-        } else {
-          onComplete(score + roundScore);
-        }
+        if (round < settings.rounds) { setRound(round + 1); startNewRound(); }
+        else { onComplete(score + roundScore); }
       }, 1500);
     }
   };

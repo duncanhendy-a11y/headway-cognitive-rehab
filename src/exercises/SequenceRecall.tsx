@@ -1,10 +1,12 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Difficulty } from '../types';
+import type { RoundTelemetry } from '../types';
 
 interface SequenceRecallProps {
   difficulty: Difficulty;
   onComplete: (score: number) => void;
   onScoreUpdate: (score: number) => void;
+  onRoundComplete?: (telemetry: RoundTelemetry) => void;
 }
 
 const getDifficultySettings = (difficulty: Difficulty) => {
@@ -15,23 +17,19 @@ const getDifficultySettings = (difficulty: Difficulty) => {
   }
 };
 
-export function SequenceRecall({ difficulty, onComplete, onScoreUpdate }: SequenceRecallProps) {
+export function SequenceRecall({ difficulty, onComplete, onScoreUpdate, onRoundComplete }: SequenceRecallProps) {
   const [sequence, setSequence] = useState<number[]>([]);
   const [userInput, setUserInput] = useState('');
   const [isShowing, setIsShowing] = useState(true);
   const [round, setRound] = useState(1);
   const [score, setScore] = useState(0);
   const [message, setMessage] = useState('Memorize the numbers...');
+  const inputStartRef = useRef<string>(new Date().toISOString());
 
   const settings = getDifficultySettings(difficulty);
 
-  useEffect(() => {
-    startNewRound();
-  }, [difficulty]);
-
-  useEffect(() => {
-    onScoreUpdate(score);
-  }, [score]);
+  useEffect(() => { startNewRound(); }, [difficulty]);
+  useEffect(() => { onScoreUpdate(score); }, [score]);
 
   const startNewRound = () => {
     const newSequence = Array.from({ length: settings.length }, () =>
@@ -45,6 +43,7 @@ export function SequenceRecall({ difficulty, onComplete, onScoreUpdate }: Sequen
     setTimeout(() => {
       setIsShowing(false);
       setMessage('Enter the sequence:');
+      inputStartRef.current = new Date().toISOString();
     }, settings.showTime);
   };
 
@@ -52,37 +51,37 @@ export function SequenceRecall({ difficulty, onComplete, onScoreUpdate }: Sequen
     const userSequence = userInput.split('').map(Number);
     const isCorrect = userSequence.length === sequence.length &&
       userSequence.every((num, idx) => num === sequence[idx]);
+    const completedAt = new Date().toISOString();
 
     if (isCorrect) {
       const roundScore = 20;
+      onRoundComplete?.({
+        round_number: round, score: roundScore, errors: 0, response_time_ms: null,
+        started_at: inputStartRef.current, completed_at: completedAt,
+        metadata: { sequence_length: settings.length },
+      });
       setScore(score + roundScore);
       setMessage('Correct! Great memory!');
-
       setTimeout(() => {
-        if (round < settings.rounds) {
-          setRound(round + 1);
-          startNewRound();
-        } else {
-          onComplete(score + roundScore);
-        }
+        if (round < settings.rounds) { setRound(round + 1); startNewRound(); }
+        else { onComplete(score + roundScore); }
       }, 1500);
     } else {
+      onRoundComplete?.({
+        round_number: round, score: 0, errors: 1, response_time_ms: null,
+        started_at: inputStartRef.current, completed_at: completedAt,
+        metadata: { sequence_length: settings.length },
+      });
       setMessage(`Incorrect! The sequence was: ${sequence.join('')}`);
       setTimeout(() => {
-        if (round < settings.rounds) {
-          setRound(round + 1);
-          startNewRound();
-        } else {
-          onComplete(score);
-        }
+        if (round < settings.rounds) { setRound(round + 1); startNewRound(); }
+        else { onComplete(score); }
       }, 2500);
     }
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' && userInput.length === sequence.length) {
-      handleSubmit();
-    }
+    if (e.key === 'Enter' && userInput.length === sequence.length) handleSubmit();
   };
 
   return (
@@ -107,9 +106,7 @@ export function SequenceRecall({ difficulty, onComplete, onScoreUpdate }: Sequen
             value={userInput}
             onChange={(e) => {
               const value = e.target.value.replace(/[^0-9]/g, '');
-              if (value.length <= sequence.length) {
-                setUserInput(value);
-              }
+              if (value.length <= sequence.length) setUserInput(value);
             }}
             onKeyPress={handleKeyPress}
             placeholder="Enter the numbers..."
@@ -117,7 +114,6 @@ export function SequenceRecall({ difficulty, onComplete, onScoreUpdate }: Sequen
             maxLength={sequence.length}
             autoFocus
           />
-
           <button
             onClick={handleSubmit}
             disabled={userInput.length !== sequence.length}
@@ -125,7 +121,6 @@ export function SequenceRecall({ difficulty, onComplete, onScoreUpdate }: Sequen
           >
             Submit
           </button>
-
           <p className="text-center text-gray-600 text-lg">
             {userInput.length}/{sequence.length} digits entered
           </p>

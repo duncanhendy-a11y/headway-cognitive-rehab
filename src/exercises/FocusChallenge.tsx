@@ -1,10 +1,12 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Difficulty } from '../types';
+import type { RoundTelemetry } from '../types';
 
 interface FocusChallengeProps {
   difficulty: Difficulty;
   onComplete: (score: number) => void;
   onScoreUpdate: (score: number) => void;
+  onRoundComplete?: (telemetry: RoundTelemetry) => void;
 }
 
 const shapes = ['⭐', '❤️', '🔷', '🔶', '⬛', '⬜', '🟢', '🔴'];
@@ -17,30 +19,27 @@ const getDifficultySettings = (difficulty: Difficulty) => {
   }
 };
 
-export function FocusChallenge({ difficulty, onComplete, onScoreUpdate }: FocusChallengeProps) {
+export function FocusChallenge({ difficulty, onComplete, onScoreUpdate, onRoundComplete }: FocusChallengeProps) {
   const [grid, setGrid] = useState<string[]>([]);
   const [target, setTarget] = useState('');
   const [found, setFound] = useState<number[]>([]);
   const [round, setRound] = useState(1);
   const [score, setScore] = useState(0);
   const [startTime, setStartTime] = useState(Date.now());
+  const [wrongClicks, setWrongClicks] = useState(0);
+  const roundStartRef = useRef<string>(new Date().toISOString());
 
   const settings = getDifficultySettings(difficulty);
   const totalCells = settings.gridSize * settings.gridSize;
 
-  useEffect(() => {
-    startNewRound();
-  }, [difficulty]);
-
-  useEffect(() => {
-    onScoreUpdate(score);
-  }, [score]);
+  useEffect(() => { startNewRound(); }, [difficulty]);
+  useEffect(() => { onScoreUpdate(score); }, [score]);
 
   const startNewRound = () => {
     const targetShape = shapes[Math.floor(Math.random() * shapes.length)];
     const newGrid: string[] = [];
-
     const targetPositions = new Set<number>();
+
     while (targetPositions.size < settings.targets) {
       targetPositions.add(Math.floor(Math.random() * totalCells));
     }
@@ -57,7 +56,10 @@ export function FocusChallenge({ difficulty, onComplete, onScoreUpdate }: FocusC
     setGrid(newGrid);
     setTarget(targetShape);
     setFound([]);
-    setStartTime(Date.now());
+    setWrongClicks(0);
+    const now = Date.now();
+    setStartTime(now);
+    roundStartRef.current = new Date(now).toISOString();
   };
 
   const handleCellClick = (index: number) => {
@@ -70,19 +72,25 @@ export function FocusChallenge({ difficulty, onComplete, onScoreUpdate }: FocusC
       if (newFound.length === settings.targets) {
         const timeBonus = Math.max(50 - Math.floor((Date.now() - startTime) / 1000) * 2, 10);
         const roundScore = 30 + timeBonus;
+        const completedAt = new Date().toISOString();
+        onRoundComplete?.({
+          round_number: round,
+          score: roundScore,
+          errors: wrongClicks,
+          response_time_ms: Date.now() - startTime,
+          started_at: roundStartRef.current,
+          completed_at: completedAt,
+          metadata: { grid_size: settings.gridSize, targets: settings.targets },
+        });
         setScore(score + roundScore);
-
         setTimeout(() => {
-          if (round < settings.rounds) {
-            setRound(round + 1);
-            startNewRound();
-          } else {
-            onComplete(score + roundScore);
-          }
+          if (round < settings.rounds) { setRound(round + 1); startNewRound(); }
+          else { onComplete(score + roundScore); }
         }, 1000);
       }
     } else {
-      setScore(Math.max(0, score - 5));
+      setWrongClicks(prev => prev + 1);
+      setScore(prev => Math.max(0, prev - 5));
     }
   };
 
@@ -102,7 +110,7 @@ export function FocusChallenge({ difficulty, onComplete, onScoreUpdate }: FocusC
         className="grid gap-3 mx-auto"
         style={{
           gridTemplateColumns: `repeat(${settings.gridSize}, 1fr)`,
-          maxWidth: `${settings.gridSize * 90}px`
+          maxWidth: `${settings.gridSize * 90}px`,
         }}
       >
         {grid.map((shape, index) => (

@@ -1,10 +1,12 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Difficulty } from '../types';
+import type { RoundTelemetry } from '../types';
 
 interface MemoryMatchProps {
   difficulty: Difficulty;
   onComplete: (score: number) => void;
   onScoreUpdate: (score: number) => void;
+  onRoundComplete?: (telemetry: RoundTelemetry) => void;
 }
 
 const emojis = ['🎨', '🎭', '🎪', '🎯', '🎸', '🎹', '🎺', '🎻', '🏀', '⚽', '🏈', '⚾', '🎾', '🏐', '🏓', '🏸'];
@@ -24,19 +26,20 @@ interface Card {
   isMatched: boolean;
 }
 
-export function MemoryMatch({ difficulty, onComplete, onScoreUpdate }: MemoryMatchProps) {
+export function MemoryMatch({ difficulty, onComplete, onScoreUpdate, onRoundComplete }: MemoryMatchProps) {
   const [cards, setCards] = useState<Card[]>([]);
   const [flippedCards, setFlippedCards] = useState<number[]>([]);
   const [moves, setMoves] = useState(0);
   const [matches, setMatches] = useState(0);
   const [_score, setScore] = useState(0);
+  // Track when the first card of a pair was flipped
+  const pairStartRef = useRef<string>(new Date().toISOString());
+  const pairStartMsRef = useRef<number>(Date.now());
 
   const settings = getDifficultySettings(difficulty);
   const totalPairs = settings.pairs;
 
-  useEffect(() => {
-    initGame();
-  }, [difficulty]);
+  useEffect(() => { initGame(); }, [difficulty]);
 
   useEffect(() => {
     const currentScore = matches * 10;
@@ -49,13 +52,7 @@ export function MemoryMatch({ difficulty, onComplete, onScoreUpdate }: MemoryMat
     const cardPairs = [...selectedEmojis, ...selectedEmojis];
     const shuffled = cardPairs
       .sort(() => Math.random() - 0.5)
-      .map((emoji, index) => ({
-        id: index,
-        emoji,
-        isFlipped: false,
-        isMatched: false,
-      }));
-
+      .map((emoji, index) => ({ id: index, emoji, isFlipped: false, isMatched: false }));
     setCards(shuffled);
     setFlippedCards([]);
     setMoves(0);
@@ -70,37 +67,56 @@ export function MemoryMatch({ difficulty, onComplete, onScoreUpdate }: MemoryMat
     const newFlipped = [...flippedCards, id];
     setFlippedCards(newFlipped);
 
+    // Record start time when first card of pair is flipped
+    if (newFlipped.length === 1) {
+      pairStartRef.current = new Date().toISOString();
+      pairStartMsRef.current = Date.now();
+    }
+
     const newCards = cards.map(card =>
       card.id === id ? { ...card, isFlipped: true } : card
     );
     setCards(newCards);
 
     if (newFlipped.length === 2) {
-      setMoves(moves + 1);
+      const currentMoves = moves + 1;
+      setMoves(currentMoves);
       const [first, second] = newFlipped;
+      const responseMs = Date.now() - pairStartMsRef.current;
+      const completedAt = new Date().toISOString();
 
       if (cards[first].emoji === cards[second].emoji) {
         setTimeout(() => {
           setCards(prev => prev.map(card =>
-            card.id === first || card.id === second
-              ? { ...card, isMatched: true }
-              : card
+            card.id === first || card.id === second ? { ...card, isMatched: true } : card
           ));
           setFlippedCards([]);
           const newMatches = matches + 1;
           setMatches(newMatches);
-
+          onRoundComplete?.({
+            round_number: currentMoves,
+            score: newMatches * 10,
+            errors: 0,
+            response_time_ms: responseMs,
+            started_at: pairStartRef.current,
+            completed_at: completedAt,
+          });
           if (newMatches === totalPairs) {
-            const finalScore = newMatches * 10;
-            setTimeout(() => onComplete(finalScore), 500);
+            setTimeout(() => onComplete(newMatches * 10), 500);
           }
         }, 600);
       } else {
+        onRoundComplete?.({
+          round_number: currentMoves,
+          score: matches * 10,
+          errors: 1,
+          response_time_ms: responseMs,
+          started_at: pairStartRef.current,
+          completed_at: completedAt,
+        });
         setTimeout(() => {
           setCards(prev => prev.map(card =>
-            card.id === first || card.id === second
-              ? { ...card, isFlipped: false }
-              : card
+            card.id === first || card.id === second ? { ...card, isFlipped: false } : card
           ));
           setFlippedCards([]);
         }, 1000);
