@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cognitive Rehabilitation App</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="app-header">
+            <h1>🧠 Cognitive Rehab</h1>
+            <div class="header-controls">
+                <div class="difficulty-selector">
+                    <label for="difficulty">Level:</label>
+                    <select id="difficulty" class="difficulty-dropdown">
+                        <option value="easy">Easy</option>
+                        <option value="medium">Medium</option>
+                        <option value="hard">Hard</option>
+                    </select>
+                </div>
+                <button class="btn-icon" id="statsBtn" title="View Statistics">📊</button>
+            </div>
+        </header>
+
+        <!-- Main Menu -->
+        <div id="mainMenu" class="main-menu">
+            <h2>Choose an Exercise</h2>
+            <div class="exercise-grid">
+                <button class="exercise-card" data-exercise="memory">
+                    <div class="exercise-icon">🧩</div>
+                    <h3>Memory Match</h3>
+                    <p>Match pairs of cards</p>
+                </button>
+                
+                <button class="exercise-card" data-exercise="pattern">
+                    <div class="exercise-icon">🎯</div>
+                    <h3>Pattern Recognition</h3>
+                    <p>Remember and repeat patterns</p>
+                </button>
+                
+                <button class="exercise-card" data-exercise="sequence">
+                    <div class="exercise-icon">🔢</div>
+                    <h3>Sequence Recall</h3>
+                    <p>Remember number sequences</p>
+                </button>
+                
+                <button class="exercise-card" data-exercise="word">
+                    <div class="exercise-icon">📝</div>
+                    <h3>Word Games</h3>
+                    <p>Word matching & recall</p>
+                </button>
+                
+                <button class="exercise-card" data-exercise="spatial">
+                    <div class="exercise-icon">🎲</div>
+                    <h3>Spatial Puzzle</h3>
+                    <p>Arrange pieces correctly</p>
+                </button>
+                
+                <button class="exercise-card" data-exercise="attention">
+                    <div class="exercise-icon">👁️</div>
+                    <h3>Focus Challenge</h3>
+                    <p>Find the target quickly</p>
+                </button>
+            </div>
+        </div>
+
+        <!-- Exercise Container -->
+        <div id="exerciseContainer" class="exercise-container hidden">
+            <div class="exercise-header">
+                <button class="btn-back" id="backBtn">← Back to Menu</button>
+                <h2 id="exerciseTitle">Exercise</h2>
+                <div class="score-display">
+                    <span id="scoreLabel">Score: <strong id="scoreValue">0</strong></span>
+                </div>
+            </div>
+            
+            <div id="exerciseContent" class="exercise-content">
+                <!-- Exercise content will be dynamically inserted here -->
+            </div>
+        </div>
+
+        <!-- Statistics Modal -->
+        <div id="statsModal" class="modal hidden">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>📊 Your Progress</h2>
+                    <button class="btn-close" id="closeStats">✕</button>
+                </div>
+                <div id="statsContent" class="stats-content">
+                    <!-- Stats will be dynamically inserted here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Completion Modal -->
+        <div id="completionModal" class="modal hidden">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>🎉 Great Job!</h2>
+                </div>
+                <div class="completion-content">
+                    <p class="completion-message" id="completionMessage"></p>
+                    <div class="completion-buttons">
+                        <button class="btn-primary" id="tryAgainBtn">Try Again</button>
+                        <button class="btn-secondary" id="menuBtn">Back to Menu</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
