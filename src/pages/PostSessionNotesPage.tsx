@@ -16,15 +16,17 @@ export function PostSessionNotesPage() {
 
   const closeSession = async (withNotes: string | null) => {
     setSaving(true);
+    const id = session.sessionId;
     await supabase
       .from('sessions')
       .update({
         notes: withNotes ?? null,
         completed_at: new Date().toISOString(),
       })
-      .eq('id', session.sessionId);
-    const id = session.sessionId;
+      .eq('id', id);
     sessionStore.clear();
+    // Fire-and-forget — generates AI summary in background
+    supabase.functions.invoke('generate-session-insights', { body: { sessionId: id } });
     setSaving(false);
     navigate(`/session/${id}/report`);
   };

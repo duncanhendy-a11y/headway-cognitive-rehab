@@ -1,10 +1,10 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { supabase } from '@/lib/supabase';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { ArrowLeft, Clock, TrendingUp } from 'lucide-react';
+import { ArrowLeft, Clock, Sparkles, TrendingUp } from 'lucide-react';
 import type { Session } from '@/types';
 
 const EXERCISE_META: Record<string, { label: string; icon: string }> = {
@@ -42,6 +42,8 @@ export function SessionReportPage() {
   const navigate = useNavigate();
   const [data, setData] = useState<SessionWithExercises | null>(null);
   const [loading, setLoading] = useState(true);
+  const [aiLoading, setAiLoading] = useState(false);
+  const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   useEffect(() => {
     if (!sessionId) return;
@@ -55,6 +57,30 @@ export function SessionReportPage() {
         setLoading(false);
       });
   }, [sessionId]);
+
+  // Poll for AI summary until it appears (edge function runs async)
+  useEffect(() => {
+    if (!data || data.ai_summary) return;
+    setAiLoading(true);
+    let polls = 0;
+    pollRef.current = setInterval(async () => {
+      polls++;
+      const { data: refreshed } = await supabase
+        .from('sessions')
+        .select('ai_summary')
+        .eq('id', sessionId!)
+        .single();
+      if (refreshed?.ai_summary) {
+        setData(prev => prev ? { ...prev, ai_summary: refreshed.ai_summary } : prev);
+        setAiLoading(false);
+        if (pollRef.current) clearInterval(pollRef.current);
+      } else if (polls >= 12) {
+        setAiLoading(false);
+        if (pollRef.current) clearInterval(pollRef.current);
+      }
+    }, 3000);
+    return () => { if (pollRef.current) clearInterval(pollRef.current); };
+  }, [data?.id]);
 
   if (loading) {
     return (
@@ -157,6 +183,29 @@ export function SessionReportPage() {
               </div>
             );
           })}
+        </CardContent>
+      </Card>
+
+      {/* AI Summary */}
+      <Card className="border-0 shadow-sm mb-6">
+        <CardContent className="p-5">
+          <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-3 flex items-center gap-1.5">
+            <Sparkles className="w-3.5 h-3.5" /> AI insights
+          </p>
+          {aiLoading && !data.ai_summary ? (
+            <div className="space-y-2">
+              <div className="h-3 bg-gray-100 rounded-full animate-pulse w-full" />
+              <div className="h-3 bg-gray-100 rounded-full animate-pulse w-5/6" />
+              <div className="h-3 bg-gray-100 rounded-full animate-pulse w-3/4" />
+              <p className="text-xs text-gray-400 mt-3">Generating insights…</p>
+            </div>
+          ) : data.ai_summary ? (
+            <p className="text-sm text-gray-700 leading-relaxed">{data.ai_summary}</p>
+          ) : (
+            <p className="text-sm text-gray-400 italic">
+              Insights will appear here once generated. Check the Insights tab on the client profile.
+            </p>
+          )}
         </CardContent>
       </Card>
 
