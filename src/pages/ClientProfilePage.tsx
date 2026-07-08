@@ -119,6 +119,7 @@ export function ClientProfilePage() {
   const [showEdit, setShowEdit] = useState(false);
   const [activeTab, setActiveTab] = useState<'overview' | 'sessions' | 'insights'>('overview');
   const [generatingInsights, setGeneratingInsights] = useState(false);
+  const [insightError, setInsightError] = useState<string | null>(null);
   const { client, sessions, insights, loading, error, refetch } = useClientData(clientId!);
 
   if (loading) {
@@ -146,18 +147,28 @@ export function ClientProfilePage() {
   const handleGenerateInsights = async () => {
     if (!sessionsWithoutInsights.length || generatingInsights) return;
     setGeneratingInsights(true);
-    for (const s of sessionsWithoutInsights) {
-      await fetch(
-        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/generate-session-insights`,
-        {
+    setInsightError(null);
+    try {
+      for (const s of sessionsWithoutInsights) {
+        const url = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/generate-session-insights`;
+        console.log('[insights] calling', url, 'for session', s.id);
+        const res = await fetch(url, {
           method: 'POST',
           headers: {
             'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({ sessionId: s.id }),
+        });
+        const json = await res.json();
+        console.log('[insights] response', res.status, json);
+        if (!res.ok) {
+          setInsightError(`Error ${res.status}: ${json.error ?? 'unknown'}`);
         }
-      );
+      }
+    } catch (e) {
+      console.error('[insights] fetch error', e);
+      setInsightError(String(e));
     }
     setGeneratingInsights(false);
     refetch();
@@ -348,19 +359,24 @@ export function ClientProfilePage() {
       {activeTab === 'insights' && (
         <>
           {sessionsWithoutInsights.length > 0 && (
-            <div className="flex items-center justify-between mb-4 px-1">
-              <p className="text-sm text-slate-400">
-                {sessionsWithoutInsights.length} session{sessionsWithoutInsights.length !== 1 ? 's' : ''} without insights
-              </p>
-              <button
-                onClick={handleGenerateInsights}
-                disabled={generatingInsights}
-                className="flex items-center gap-1.5 text-xs font-semibold px-3 py-2 rounded-lg transition-colors"
-                style={{ backgroundColor: '#EEF3FA', color: '#003361' }}
-              >
-                <Sparkle weight="fill" className="w-3.5 h-3.5" style={{ color: '#FEDC00' }} />
-                {generatingInsights ? 'Generating…' : 'Generate all insights'}
-              </button>
+            <div className="mb-4 px-1">
+              <div className="flex items-center justify-between">
+                <p className="text-sm text-slate-400">
+                  {sessionsWithoutInsights.length} session{sessionsWithoutInsights.length !== 1 ? 's' : ''} without insights
+                </p>
+                <button
+                  onClick={handleGenerateInsights}
+                  disabled={generatingInsights}
+                  className="flex items-center gap-1.5 text-xs font-semibold px-3 py-2 rounded-lg transition-colors"
+                  style={{ backgroundColor: '#EEF3FA', color: '#003361' }}
+                >
+                  <Sparkle weight="fill" className="w-3.5 h-3.5" style={{ color: '#FEDC00' }} />
+                  {generatingInsights ? 'Generating…' : 'Generate all insights'}
+                </button>
+              </div>
+              {insightError && (
+                <p className="text-xs text-red-500 mt-2">{insightError}</p>
+              )}
             </div>
           )}
           {insights.length === 0 ? (
