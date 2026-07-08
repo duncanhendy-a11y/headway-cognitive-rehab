@@ -45,6 +45,7 @@ export function SessionReportPage() {
   const [data, setData] = useState<SessionWithExercises | null>(null);
   const [loading, setLoading] = useState(true);
   const [aiLoading, setAiLoading] = useState(false);
+  const [aiRetrying, setAiRetrying] = useState(false);
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   useEffect(() => {
@@ -60,8 +61,8 @@ export function SessionReportPage() {
       });
   }, [sessionId]);
 
-  useEffect(() => {
-    if (!data || data.ai_summary) return;
+  const startPolling = (id: string) => {
+    if (pollRef.current) clearInterval(pollRef.current);
     setAiLoading(true);
     let polls = 0;
     pollRef.current = setInterval(async () => {
@@ -69,19 +70,32 @@ export function SessionReportPage() {
       const { data: refreshed } = await supabase
         .from('sessions')
         .select('ai_summary')
-        .eq('id', sessionId!)
+        .eq('id', id)
         .single();
       if (refreshed?.ai_summary) {
         setData(prev => prev ? { ...prev, ai_summary: refreshed.ai_summary } : prev);
         setAiLoading(false);
         if (pollRef.current) clearInterval(pollRef.current);
-      } else if (polls >= 12) {
+      } else if (polls >= 20) {
         setAiLoading(false);
         if (pollRef.current) clearInterval(pollRef.current);
       }
     }, 3000);
+  };
+
+  useEffect(() => {
+    if (!data || data.ai_summary) return;
+    startPolling(data.id);
     return () => { if (pollRef.current) clearInterval(pollRef.current); };
   }, [data?.id]);
+
+  const handleRetryInsights = async () => {
+    if (!sessionId) return;
+    setAiRetrying(true);
+    await supabase.functions.invoke('generate-session-insights', { body: { sessionId } });
+    setAiRetrying(false);
+    startPolling(sessionId);
+  };
 
   if (loading) {
     return (
@@ -207,9 +221,19 @@ export function SessionReportPage() {
             ) : data.ai_summary ? (
               <p className="text-sm text-slate-600 leading-relaxed">{data.ai_summary}</p>
             ) : (
-              <p className="text-sm text-slate-400 italic">
-                Insights will appear here once generated. Check the Insights tab on the client profile.
-              </p>
+              <div>
+                <p className="text-sm text-slate-400 mb-3">
+                  Insights did not generate automatically.
+                </p>
+                <button
+                  onClick={handleRetryInsights}
+                  disabled={aiRetrying}
+                  className="text-xs font-semibold px-3 py-1.5 rounded-lg transition-colors"
+                  style={{ backgroundColor: '#EEF3FA', color: '#003361' }}
+                >
+                  {aiRetrying ? 'Generating…' : 'Generate insights'}
+                </button>
+              </div>
             )}
           </CardContent>
         </div>

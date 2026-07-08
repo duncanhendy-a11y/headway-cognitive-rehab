@@ -26,9 +26,8 @@ export function PostSessionNotesPage() {
       })
       .eq('id', id);
     sessionStore.clear();
-    supabase.functions.invoke('generate-session-insights', { body: { sessionId: id } });
-    setSaving(false);
     navigate(`/session/${id}/report`);
+    supabase.functions.invoke('generate-session-insights', { body: { sessionId: id } });
   };
 
   return (
