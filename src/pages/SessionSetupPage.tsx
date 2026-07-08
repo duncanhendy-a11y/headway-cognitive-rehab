@@ -13,22 +13,63 @@ import {
 import { toast } from 'sonner';
 import type { Difficulty, ExerciseType } from '@/types';
 
-const EXERCISE_ICONS: Record<string, React.ReactNode> = {
-  memory:    <Cards weight="duotone" className="w-8 h-8" />,
-  pattern:   <GridFour weight="duotone" className="w-8 h-8" />,
-  sequence:  <ListNumbers weight="duotone" className="w-8 h-8" />,
-  word:      <TextT weight="duotone" className="w-8 h-8" />,
-  spatial:   <PuzzlePiece weight="duotone" className="w-8 h-8" />,
-  attention: <Crosshair weight="duotone" className="w-8 h-8" />,
-};
-
-const EXERCISES: { id: ExerciseType; label: string; domain: string }[] = [
-  { id: 'memory',    label: 'Memory Match',        domain: 'Short-term memory' },
-  { id: 'pattern',   label: 'Pattern Recognition', domain: 'Sequential memory' },
-  { id: 'sequence',  label: 'Sequence Recall',     domain: 'Working memory' },
-  { id: 'word',      label: 'Word Games',           domain: 'Language' },
-  { id: 'spatial',   label: 'Spatial Puzzle',       domain: 'Spatial reasoning' },
-  { id: 'attention', label: 'Focus Challenge',      domain: 'Sustained attention' },
+// Each cognitive domain maps directly to one exercise
+const DOMAINS: {
+  id: ExerciseType;
+  label: string;
+  description: string;
+  exercise: string;
+  icon: React.ReactNode;
+  colour: string;
+}[] = [
+  {
+    id: 'memory',
+    label: 'Short-term Memory',
+    description: 'Remembering new information over a short period',
+    exercise: 'Memory Match',
+    icon: <Cards weight="duotone" className="w-7 h-7" />,
+    colour: '#4f8ef7',
+  },
+  {
+    id: 'pattern',
+    label: 'Sequential Memory',
+    description: 'Following and recalling ordered steps or patterns',
+    exercise: 'Pattern Recognition',
+    icon: <GridFour weight="duotone" className="w-7 h-7" />,
+    colour: '#9b59b6',
+  },
+  {
+    id: 'sequence',
+    label: 'Working Memory',
+    description: 'Holding information in mind while completing a task',
+    exercise: 'Sequence Recall',
+    icon: <ListNumbers weight="duotone" className="w-7 h-7" />,
+    colour: '#e67e22',
+  },
+  {
+    id: 'word',
+    label: 'Language',
+    description: 'Word-finding, expression and verbal understanding',
+    exercise: 'Word Games',
+    icon: <TextT weight="duotone" className="w-7 h-7" />,
+    colour: '#27ae60',
+  },
+  {
+    id: 'spatial',
+    label: 'Spatial Reasoning',
+    description: 'Perceiving and navigating shapes, space and orientation',
+    exercise: 'Spatial Puzzle',
+    icon: <PuzzlePiece weight="duotone" className="w-7 h-7" />,
+    colour: '#e74c3c',
+  },
+  {
+    id: 'attention',
+    label: 'Sustained Attention',
+    description: 'Maintaining focus over time without losing track',
+    exercise: 'Focus Challenge',
+    icon: <Crosshair weight="duotone" className="w-7 h-7" />,
+    colour: '#16a085',
+  },
 ];
 
 const DIFFICULTIES: { id: Difficulty; label: string; description: string; icon: React.ReactNode; colour: string }[] = [
@@ -44,7 +85,7 @@ export function SessionSetupPage() {
   const { professional, loading: profLoading } = useProfessional();
 
   const [step, setStep] = useState(1);
-  const [selectedExercises, setSelectedExercises] = useState<ExerciseType[]>(EXERCISES.map(e => e.id));
+  const [selectedDomains, setSelectedDomains] = useState<ExerciseType[]>([]);
   const [difficulty, setDifficulty] = useState<Difficulty>('easy');
   const [creating, setCreating] = useState(false);
 
@@ -59,15 +100,15 @@ export function SessionSetupPage() {
     );
   }
 
-  const toggleExercise = (id: ExerciseType) => {
-    setSelectedExercises(prev =>
-      prev.includes(id) ? prev.filter(e => e !== id) : [...prev, id]
+  const toggleDomain = (id: ExerciseType) => {
+    setSelectedDomains(prev =>
+      prev.includes(id) ? prev.filter(d => d !== id) : [...prev, id]
     );
   };
 
   const handleBeginSession = async () => {
     if (!professional) { toast.error('Profile not loaded. Please wait and try again.'); return; }
-    if (selectedExercises.length === 0) { toast.error('Select at least one exercise.'); return; }
+    if (selectedDomains.length === 0) { toast.error('Select at least one area to work on.'); return; }
 
     setCreating(true);
 
@@ -90,13 +131,18 @@ export function SessionSetupPage() {
       return;
     }
 
+    // Preserve the order of DOMAINS for exercise sequencing
+    const orderedExercises = DOMAINS
+      .filter(d => selectedDomains.includes(d.id))
+      .map(d => d.id);
+
     sessionStore.set({
       sessionId: data.id,
       clientId,
       clientIdentifier,
       professionalId: professional.id,
       difficulty,
-      selectedExercises: [...selectedExercises],
+      selectedExercises: orderedExercises,
     });
 
     navigate('/session/exercise');
@@ -130,42 +176,37 @@ export function SessionSetupPage() {
         </div>
       </div>
 
-      {/* Step 1 — exercises */}
+      {/* Step 1 — cognitive areas */}
       {step === 1 && (
         <div>
-          <h2 className="text-lg font-semibold mb-1" style={{ color: '#003361' }}>Choose exercises</h2>
-          <p className="text-sm text-slate-400 mb-5">Select which exercises to include in this session.</p>
+          <h2 className="text-lg font-semibold mb-1" style={{ color: '#003361' }}>What would you like to work on?</h2>
+          <p className="text-sm text-slate-400 mb-5">Select the cognitive areas to target. Exercises are chosen automatically.</p>
           <div className="grid grid-cols-2 gap-3">
-            {EXERCISES.map(ex => {
-              const selected = selectedExercises.includes(ex.id);
+            {DOMAINS.map(domain => {
+              const selected = selectedDomains.includes(domain.id);
               return (
                 <button
-                  key={ex.id}
-                  onClick={() => toggleExercise(ex.id)}
+                  key={domain.id}
+                  onClick={() => toggleDomain(domain.id)}
                   className={`text-left p-4 rounded-2xl border-2 transition-all ${
-                    selected
-                      ? 'border-headway-navy bg-blue-50/50'
-                      : 'border-slate-200 bg-white hover:border-slate-300'
+                    selected ? 'bg-blue-50/40' : 'border-slate-200 bg-white hover:border-slate-300'
                   }`}
                   style={selected ? { borderColor: '#003361' } : {}}
                 >
-                  <div className="flex items-start gap-3">
-                    <span style={{ color: selected ? '#003361' : '#94a3b8' }}>
-                      {EXERCISE_ICONS[ex.id]}
-                    </span>
-                    <div className="flex-1 min-w-0 pt-0.5">
-                      <div className="flex items-center justify-between gap-1">
-                        <p className="font-semibold text-sm" style={{ color: '#003361' }}>{ex.label}</p>
-                        {selected && (
-                          <div className="w-4 h-4 rounded-full flex items-center justify-center flex-shrink-0"
-                            style={{ backgroundColor: '#003361' }}>
-                            <Check weight="bold" className="w-2.5 h-2.5 text-white" />
-                          </div>
-                        )}
-                      </div>
-                      <p className="text-xs text-slate-400 mt-0.5">{ex.domain}</p>
+                  <div className="flex items-start justify-between gap-2 mb-3">
+                    <div className="w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0"
+                      style={{ backgroundColor: `${domain.colour}18`, color: domain.colour }}>
+                      {domain.icon}
                     </div>
+                    {selected && (
+                      <div className="w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5"
+                        style={{ backgroundColor: '#003361' }}>
+                        <Check weight="bold" className="w-3 h-3 text-white" />
+                      </div>
+                    )}
                   </div>
+                  <p className="font-semibold text-sm leading-tight mb-1" style={{ color: '#003361' }}>{domain.label}</p>
+                  <p className="text-xs text-slate-400 leading-snug">{domain.description}</p>
                 </button>
               );
             })}
@@ -173,10 +214,11 @@ export function SessionSetupPage() {
           <Button
             className="w-full mt-6 font-semibold gap-2"
             style={{ backgroundColor: '#003361', color: 'white' }}
-            disabled={selectedExercises.length === 0}
+            disabled={selectedDomains.length === 0}
             onClick={() => setStep(2)}
           >
-            Continue ({selectedExercises.length} selected) <ArrowRight className="w-4 h-4" />
+            Continue ({selectedDomains.length} area{selectedDomains.length !== 1 ? 's' : ''} selected)
+            <ArrowRight className="w-4 h-4" />
           </Button>
         </div>
       )}
@@ -245,22 +287,23 @@ export function SessionSetupPage() {
                   <p className="text-xs text-slate-400">Client</p>
                 </div>
               </div>
-              <div className="border-t border-slate-100 pt-4 grid grid-cols-2 gap-4">
-                <div>
-                  <p className="text-xs text-slate-400 mb-2 uppercase tracking-wide">Exercises ({selectedExercises.length})</p>
-                  <div className="space-y-1.5">
-                    {selectedExercises.map(id => {
-                      const ex = EXERCISES.find(e => e.id === id)!;
-                      return (
-                        <div key={id} className="flex items-center gap-2 text-xs text-slate-600">
-                          <span style={{ color: '#6491C0' }}>{EXERCISE_ICONS[id]}</span>
-                          {ex.label}
+              <div className="border-t border-slate-100 pt-4">
+                <p className="text-xs text-slate-400 mb-3 uppercase tracking-wide">Target areas ({selectedDomains.length})</p>
+                <div className="space-y-2">
+                  {DOMAINS.filter(d => selectedDomains.includes(d.id)).map(domain => (
+                    <div key={domain.id} className="flex items-center justify-between">
+                      <div className="flex items-center gap-2.5">
+                        <div className="w-7 h-7 rounded-lg flex items-center justify-center"
+                          style={{ backgroundColor: `${domain.colour}18`, color: domain.colour }}>
+                          {domain.icon}
                         </div>
-                      );
-                    })}
-                  </div>
+                        <span className="text-sm font-medium" style={{ color: '#003361' }}>{domain.label}</span>
+                      </div>
+                      <span className="text-xs text-slate-400">{domain.exercise}</span>
+                    </div>
+                  ))}
                 </div>
-                <div>
+                <div className="mt-4 pt-3 border-t border-slate-100">
                   <p className="text-xs text-slate-400 mb-2 uppercase tracking-wide">Difficulty</p>
                   {(() => {
                     const d = DIFFICULTIES.find(d => d.id === difficulty)!;

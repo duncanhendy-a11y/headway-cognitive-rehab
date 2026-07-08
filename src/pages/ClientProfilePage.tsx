@@ -5,13 +5,14 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import {
   ArrowLeft, Play, Brain, ClipboardText, Lightbulb, Calendar, Clock,
-  TrendUp, Warning, TrendDown, ChartPieSlice, Sparkle,
+  TrendUp, Warning, TrendDown, ChartPieSlice,
 } from '@phosphor-icons/react';
 import { DomainRadarChart } from '@/components/DomainRadarChart';
 import { EditClientDialog } from '@/components/EditClientDialog';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { useState } from 'react';
-import type { Session, AiInsight } from '@/types';
+import { calculateInsights, type CodedInsight } from '@/lib/insights';
+import type { Session } from '@/types';
 
 const EXERCISE_LABELS: Record<string, string> = {
   memory:    'Memory Match',
@@ -93,8 +94,9 @@ const INSIGHT_ICONS: Record<string, React.ReactNode> = {
   domain_analysis:  <ChartPieSlice weight="fill" className="w-5 h-5 flex-shrink-0 mt-0.5" style={{ color: '#6491C0' }} />,
 };
 
-function InsightCard({ insight }: { insight: AiInsight }) {
+function InsightCard({ insight }: { insight: CodedInsight }) {
   const icon = INSIGHT_ICONS[insight.type] ?? <ChartPieSlice weight="fill" className="w-5 h-5 text-slate-400 flex-shrink-0 mt-0.5" />;
+  const label = insight.type.replace(/_/g, ' ');
   return (
     <Card className="border-0 shadow-sm rounded-2xl bg-white">
       <CardContent className="p-5">
@@ -102,10 +104,9 @@ function InsightCard({ insight }: { insight: AiInsight }) {
           {icon}
           <div>
             <Badge className="text-xs mb-2 capitalize font-medium" style={{ backgroundColor: '#EEF3FA', color: '#003361', border: 'none' }}>
-              {insight.type.replace('_', ' ')}
+              {label}
             </Badge>
             <p className="text-sm text-slate-600 leading-relaxed">{insight.content}</p>
-            <p className="text-xs text-slate-400 mt-2">{formatDate(insight.generated_at)}</p>
           </div>
         </div>
       </CardContent>
@@ -118,9 +119,7 @@ export function ClientProfilePage() {
   const navigate = useNavigate();
   const [showEdit, setShowEdit] = useState(false);
   const [activeTab, setActiveTab] = useState<'overview' | 'sessions' | 'insights'>('overview');
-  const [generatingInsights, setGeneratingInsights] = useState(false);
-  const [insightError, setInsightError] = useState<string | null>(null);
-  const { client, sessions, insights, loading, error, refetch } = useClientData(clientId!);
+  const { client, sessions, loading, error, refetch } = useClientData(clientId!);
 
   if (loading) {
     return <div className="p-8 flex items-center justify-center h-full"><div className="text-slate-400 text-sm">Loading…</div></div>;
@@ -141,38 +140,7 @@ export function ClientProfilePage() {
   });
 
   const lastSession = sessionsTyped[0];
-
-  const sessionsWithoutInsights = sessionsTyped.filter(s => s.completed_at && !s.ai_summary);
-
-  const handleGenerateInsights = async () => {
-    if (!sessionsWithoutInsights.length || generatingInsights) return;
-    setGeneratingInsights(true);
-    setInsightError(null);
-    try {
-      for (const s of sessionsWithoutInsights) {
-        const url = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/generate-session-insights`;
-        console.log('[insights] calling', url, 'for session', s.id);
-        const res = await fetch(url, {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ sessionId: s.id }),
-        });
-        const json = await res.json();
-        console.log('[insights] response', res.status, json);
-        if (!res.ok) {
-          setInsightError(`Error ${res.status}: ${json.error ?? 'unknown'}`);
-        }
-      }
-    } catch (e) {
-      console.error('[insights] fetch error', e);
-      setInsightError(String(e));
-    }
-    setGeneratingInsights(false);
-    refetch();
-  };
+  const codedInsights = calculateInsights(sessionsTyped);
 
   const tabs = [
     { id: 'overview' as const,  label: 'Overview',               icon: <Brain className="w-3.5 h-3.5" /> },
@@ -357,48 +325,23 @@ export function ClientProfilePage() {
 
       {/* Insights */}
       {activeTab === 'insights' && (
-        <>
-          {sessionsWithoutInsights.length > 0 && (
-            <div className="mb-4 px-1">
-              <div className="flex items-center justify-between">
-                <p className="text-sm text-slate-400">
-                  {sessionsWithoutInsights.length} session{sessionsWithoutInsights.length !== 1 ? 's' : ''} without insights
-                </p>
-                <button
-                  onClick={handleGenerateInsights}
-                  disabled={generatingInsights}
-                  className="flex items-center gap-1.5 text-xs font-semibold px-3 py-2 rounded-lg transition-colors"
-                  style={{ backgroundColor: '#EEF3FA', color: '#003361' }}
-                >
-                  <Sparkle weight="fill" className="w-3.5 h-3.5" style={{ color: '#FEDC00' }} />
-                  {generatingInsights ? 'Generating…' : 'Generate all insights'}
-                </button>
+        codedInsights.length === 0 ? (
+          <Card className="border-dashed border-2 border-slate-200 shadow-none bg-transparent rounded-2xl">
+            <CardContent className="py-16 text-center">
+              <div className="w-12 h-12 rounded-2xl flex items-center justify-center mx-auto mb-4" style={{ backgroundColor: '#EEF3FA' }}>
+                <Lightbulb className="w-6 h-6" style={{ color: '#6491C0' }} />
               </div>
-              {insightError && (
-                <p className="text-xs text-red-500 mt-2">{insightError}</p>
-              )}
-            </div>
-          )}
-          {insights.length === 0 ? (
-            <Card className="border-dashed border-2 border-slate-200 shadow-none bg-transparent rounded-2xl">
-              <CardContent className="py-16 text-center">
-                <div className="w-12 h-12 rounded-2xl flex items-center justify-center mx-auto mb-4" style={{ backgroundColor: '#EEF3FA' }}>
-                  <Lightbulb className="w-6 h-6" style={{ color: '#6491C0' }} />
-                </div>
-                <p className="text-slate-600 font-semibold">No AI insights yet</p>
-                <p className="text-slate-400 text-sm mt-1">
-                  {sessions.length > 0
-                    ? 'Use the button above to generate insights for your sessions.'
-                    : 'Insights are generated automatically after sessions are completed.'}
-                </p>
-              </CardContent>
-            </Card>
-          ) : (
-            <div className="space-y-4">
-              {insights.map(insight => <InsightCard key={insight.id} insight={insight} />)}
-            </div>
-          )}
-        </>
+              <p className="text-slate-600 font-semibold">No insights yet</p>
+              <p className="text-slate-400 text-sm mt-1">
+                Insights appear automatically after sessions are completed.
+              </p>
+            </CardContent>
+          </Card>
+        ) : (
+          <div className="space-y-4">
+            {codedInsights.map(insight => <InsightCard key={insight.id} insight={insight} />)}
+          </div>
+        )
       )}
 
       <EditClientDialog
