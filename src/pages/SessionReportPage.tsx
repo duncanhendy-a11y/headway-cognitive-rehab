@@ -92,7 +92,17 @@ export function SessionReportPage() {
   const handleRetryInsights = async () => {
     if (!sessionId) return;
     setAiRetrying(true);
-    await supabase.functions.invoke('generate-session-insights', { body: { sessionId } });
+    await fetch(
+      `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/generate-session-insights`,
+      {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ sessionId }),
+      }
+    );
     setAiRetrying(false);
     startPolling(sessionId);
   };

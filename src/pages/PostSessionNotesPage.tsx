@@ -27,7 +27,17 @@ export function PostSessionNotesPage() {
       .eq('id', id);
     sessionStore.clear();
     navigate(`/session/${id}/report`);
-    supabase.functions.invoke('generate-session-insights', { body: { sessionId: id } });
+    fetch(
+      `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/generate-session-insights`,
+      {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ sessionId: id }),
+      }
+    );
   };
 
   return (

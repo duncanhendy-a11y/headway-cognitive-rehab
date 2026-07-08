@@ -11,7 +11,6 @@ import { DomainRadarChart } from '@/components/DomainRadarChart';
 import { EditClientDialog } from '@/components/EditClientDialog';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { useState } from 'react';
-import { supabase } from '@/lib/supabase';
 import type { Session, AiInsight } from '@/types';
 
 const EXERCISE_LABELS: Record<string, string> = {
@@ -148,7 +147,17 @@ export function ClientProfilePage() {
     if (!sessionsWithoutInsights.length || generatingInsights) return;
     setGeneratingInsights(true);
     for (const s of sessionsWithoutInsights) {
-      await supabase.functions.invoke('generate-session-insights', { body: { sessionId: s.id } });
+      await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/generate-session-insights`,
+        {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ sessionId: s.id }),
+        }
+      );
     }
     setGeneratingInsights(false);
     refetch();
