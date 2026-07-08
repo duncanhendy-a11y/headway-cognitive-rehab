@@ -211,27 +211,24 @@ export function SessionReportPage() {
             <p className="text-xs font-semibold text-slate-400 uppercase tracking-wide mb-3 flex items-center gap-1.5">
               <Sparkle weight="fill" className="w-3.5 h-3.5" style={{ color: '#FEDC00' }} /> AI insights
             </p>
-            {aiLoading && !data.ai_summary ? (
-              <div className="space-y-2">
-                <div className="h-2.5 bg-slate-100 rounded-full animate-pulse w-full" />
-                <div className="h-2.5 bg-slate-100 rounded-full animate-pulse w-5/6" />
-                <div className="h-2.5 bg-slate-100 rounded-full animate-pulse w-3/4" />
-                <p className="text-xs text-slate-400 mt-3">Generating insights…</p>
-              </div>
-            ) : data.ai_summary ? (
+            {data.ai_summary ? (
               <p className="text-sm text-slate-600 leading-relaxed">{data.ai_summary}</p>
             ) : (
-              <div>
-                <p className="text-sm text-slate-400 mb-3">
-                  Insights did not generate automatically.
-                </p>
+              <div className="space-y-3">
+                {aiLoading && (
+                  <div className="space-y-2">
+                    <div className="h-2.5 bg-slate-100 rounded-full animate-pulse w-full" />
+                    <div className="h-2.5 bg-slate-100 rounded-full animate-pulse w-5/6" />
+                    <div className="h-2.5 bg-slate-100 rounded-full animate-pulse w-3/4" />
+                  </div>
+                )}
                 <button
                   onClick={handleRetryInsights}
-                  disabled={aiRetrying}
-                  className="text-xs font-semibold px-3 py-1.5 rounded-lg transition-colors"
+                  disabled={aiRetrying || aiLoading}
+                  className="text-xs font-semibold px-3 py-2 rounded-lg transition-colors"
                   style={{ backgroundColor: '#EEF3FA', color: '#003361' }}
                 >
-                  {aiRetrying ? 'Generating…' : 'Generate insights'}
+                  {aiRetrying ? 'Generating…' : aiLoading ? 'Generating insights…' : 'Generate insights'}
                 </button>
               </div>
             )}

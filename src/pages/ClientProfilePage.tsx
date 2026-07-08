@@ -5,12 +5,13 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import {
   ArrowLeft, Play, Brain, ClipboardText, Lightbulb, Calendar, Clock,
-  TrendUp, Warning, TrendDown, ChartPieSlice,
+  TrendUp, Warning, TrendDown, ChartPieSlice, Sparkle,
 } from '@phosphor-icons/react';
 import { DomainRadarChart } from '@/components/DomainRadarChart';
 import { EditClientDialog } from '@/components/EditClientDialog';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { useState } from 'react';
+import { supabase } from '@/lib/supabase';
 import type { Session, AiInsight } from '@/types';
 
 const EXERCISE_LABELS: Record<string, string> = {
@@ -118,6 +119,7 @@ export function ClientProfilePage() {
   const navigate = useNavigate();
   const [showEdit, setShowEdit] = useState(false);
   const [activeTab, setActiveTab] = useState<'overview' | 'sessions' | 'insights'>('overview');
+  const [generatingInsights, setGeneratingInsights] = useState(false);
   const { client, sessions, insights, loading, error, refetch } = useClientData(clientId!);
 
   if (loading) {
@@ -139,6 +141,18 @@ export function ClientProfilePage() {
   });
 
   const lastSession = sessionsTyped[0];
+
+  const sessionsWithoutInsights = sessionsTyped.filter(s => s.completed_at && !s.ai_summary);
+
+  const handleGenerateInsights = async () => {
+    if (!sessionsWithoutInsights.length || generatingInsights) return;
+    setGeneratingInsights(true);
+    for (const s of sessionsWithoutInsights) {
+      await supabase.functions.invoke('generate-session-insights', { body: { sessionId: s.id } });
+    }
+    setGeneratingInsights(false);
+    refetch();
+  };
 
   const tabs = [
     { id: 'overview' as const,  label: 'Overview',               icon: <Brain className="w-3.5 h-3.5" /> },
@@ -323,23 +337,43 @@ export function ClientProfilePage() {
 
       {/* Insights */}
       {activeTab === 'insights' && (
-        insights.length === 0 ? (
-          <Card className="border-dashed border-2 border-slate-200 shadow-none bg-transparent rounded-2xl">
-            <CardContent className="py-16 text-center">
-              <div className="w-12 h-12 rounded-2xl flex items-center justify-center mx-auto mb-4" style={{ backgroundColor: '#EEF3FA' }}>
-                <Lightbulb className="w-6 h-6" style={{ color: '#6491C0' }} />
-              </div>
-              <p className="text-slate-600 font-semibold">No AI insights yet</p>
-              <p className="text-slate-400 text-sm mt-1">
-                Insights are generated automatically after sessions are completed.
+        <>
+          {sessionsWithoutInsights.length > 0 && (
+            <div className="flex items-center justify-between mb-4 px-1">
+              <p className="text-sm text-slate-400">
+                {sessionsWithoutInsights.length} session{sessionsWithoutInsights.length !== 1 ? 's' : ''} without insights
               </p>
-            </CardContent>
-          </Card>
-        ) : (
-          <div className="space-y-4">
-            {insights.map(insight => <InsightCard key={insight.id} insight={insight} />)}
-          </div>
-        )
+              <button
+                onClick={handleGenerateInsights}
+                disabled={generatingInsights}
+                className="flex items-center gap-1.5 text-xs font-semibold px-3 py-2 rounded-lg transition-colors"
+                style={{ backgroundColor: '#EEF3FA', color: '#003361' }}
+              >
+                <Sparkle weight="fill" className="w-3.5 h-3.5" style={{ color: '#FEDC00' }} />
+                {generatingInsights ? 'Generating…' : 'Generate all insights'}
+              </button>
+            </div>
+          )}
+          {insights.length === 0 ? (
+            <Card className="border-dashed border-2 border-slate-200 shadow-none bg-transparent rounded-2xl">
+              <CardContent className="py-16 text-center">
+                <div className="w-12 h-12 rounded-2xl flex items-center justify-center mx-auto mb-4" style={{ backgroundColor: '#EEF3FA' }}>
+                  <Lightbulb className="w-6 h-6" style={{ color: '#6491C0' }} />
+                </div>
+                <p className="text-slate-600 font-semibold">No AI insights yet</p>
+                <p className="text-slate-400 text-sm mt-1">
+                  {sessions.length > 0
+                    ? 'Use the button above to generate insights for your sessions.'
+                    : 'Insights are generated automatically after sessions are completed.'}
+                </p>
+              </CardContent>
+            </Card>
+          ) : (
+            <div className="space-y-4">
+              {insights.map(insight => <InsightCard key={insight.id} insight={insight} />)}
+            </div>
+          )}
+        </>
       )}
 
       <EditClientDialog
