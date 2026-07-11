@@ -1,35 +1,24 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase';
-import { useAuth } from '@/contexts/AuthContext';
 import type { Professional } from '@/types';
 
+// POC BYPASS — fetches the first professional in the DB instead of upserting
+// by auth user ID. Re-enable auth-based upsert when auth is restored.
 export function useProfessional() {
-  const { user } = useAuth();
   const [professional, setProfessional] = useState<Professional | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!user) { setLoading(false); return; }
-    load();
-  }, [user?.id]);
-
-  async function load() {
-    if (!user) return;
-    const { data } = await supabase
+    supabase
       .from('professionals')
-      .upsert(
-        {
-          auth_user_id: user.id,
-          email: user.email ?? '',
-          full_name: user.user_metadata?.full_name ?? user.email ?? 'Professional',
-        },
-        { onConflict: 'auth_user_id' }
-      )
-      .select()
-      .single();
-    if (data) setProfessional(data as Professional);
-    setLoading(false);
-  }
+      .select('*')
+      .limit(1)
+      .single()
+      .then(({ data }) => {
+        if (data) setProfessional(data as Professional);
+        setLoading(false);
+      });
+  }, []);
 
   return { professional, loading };
 }
