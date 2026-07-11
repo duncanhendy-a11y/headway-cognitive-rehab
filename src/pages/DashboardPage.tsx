@@ -22,21 +22,21 @@ export function DashboardPage() {
   }, [user]);
 
   const loadProfessionalAndClients = async () => {
-    if (!user) return;
-
-    const { data: prof, error: profErr } = await supabase
+    // POC BYPASS — fetch first professional (no auth-based upsert) and all active
+    // clients regardless of professional_id. Re-scope to professional_id when auth
+    // is restored.
+    const { data: prof } = await supabase
       .from('professionals')
-      .upsert({ email: user.email!, full_name: user.email!.split('@')[0], auth_user_id: user.id }, { onConflict: 'email' })
-      .select()
+      .select('*')
+      .limit(1)
       .single();
 
-    if (profErr || !prof) { setLoading(false); return; }
+    if (!prof) { setLoading(false); return; }
     setProfessionalId(prof.id);
 
     const { data: clientData } = await supabase
       .from('clients')
       .select('*')
-      .eq('professional_id', prof.id)
       .eq('is_active', true)
       .order('created_at', { ascending: false });
 

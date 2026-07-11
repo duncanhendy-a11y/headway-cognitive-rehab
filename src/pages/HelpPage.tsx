@@ -29,9 +29,9 @@ export function HelpPage() {
           <div className="space-y-4">
             {[
               { step: 1, icon: Brain, title: 'Add a client', body: 'From your dashboard, click "Add client" and enter a name or reference code. No other personal data is stored.' },
-              { step: 2, icon: ClipboardList, title: 'Start a session', body: 'Click "Start session" on any client card. Choose which exercises to run and set the difficulty level.' },
+              { step: 2, icon: ClipboardList, title: 'Start a session', body: 'Click "Start session" on any client card. Choose the cognitive area you want to focus on — memory, attention, language, and so on. The app assigns the right exercises automatically and you set the difficulty level.' },
               { step: 3, icon: Brain, title: 'Hand over the device', body: 'The client will see a calm, full-screen view with only their name. No other client information is visible.' },
-              { step: 4, icon: ClipboardList, title: 'Record your notes', body: 'After the exercises, add your observations. The AI will generate a draft summary which you can edit before saving.' },
+              { step: 4, icon: ClipboardList, title: 'Review the session', body: 'After the exercises, add your observations. A performance summary is generated automatically from the results — no AI required, so it works offline and never fails. Plateau alerts and regression flags appear here too.' },
             ].map(({ step, title, body }) => (
               <Card key={step} className="border-0 shadow-sm">
                 <CardHeader className="pb-2">
