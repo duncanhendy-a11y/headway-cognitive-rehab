@@ -394,74 +394,60 @@
   <div class="matrix-wrap">
     <div class="section-title">Feature priority map</div>
     <p class="section-intro">Where each feature cluster sits. Work left-to-right — high-return investments first.</p>
-
-    <div style="display:grid;grid-template-columns:20px 1fr 1fr;grid-template-rows:auto 1fr 1fr auto;gap:0;margin-top:8px;">
-
-      <!-- Y-axis label -->
-      <div style="grid-column:1;grid-row:1/4;display:flex;align-items:center;justify-content:center;">
-        <span style="writing-mode:vertical-rl;transform:rotate(180deg);font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);">Impact →</span>
-      </div>
-
-      <!-- Column headers -->
-      <div style="grid-column:2;grid-row:1;padding:6px 12px 10px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);text-align:center;">Low effort</div>
-      <div style="grid-column:3;grid-row:1;padding:6px 12px 10px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);text-align:center;">High effort</div>
-
-      <!-- Q1: High impact, Low effort -->
-      <div style="grid-column:2;grid-row:2;background:rgba(34,135,92,.06);border:1px solid rgba(34,135,92,.2);border-radius:10px 0 0 0;padding:16px 18px;">
-        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#22875C;margin-bottom:12px;">High impact · low effort — do first</div>
-        <div style="display:flex;flex-direction:column;gap:8px;">
-          <div style="display:flex;align-items:center;gap:8px;"><span style="width:8px;height:8px;border-radius:50%;background:#22875C;flex-shrink:0;display:inline-block;"></span><span style="font-size:13px;color:var(--ink);font-weight:600;">Deficit-led session setup</span><span style="font-size:11px;color:#22875C;font-weight:600;margin-left:auto;white-space:nowrap;">P1 · Live</span></div>
-          <div style="display:flex;align-items:center;gap:8px;"><span style="width:8px;height:8px;border-radius:50%;background:#22875C;flex-shrink:0;display:inline-block;"></span><span style="font-size:13px;color:var(--ink);font-weight:600;">Coded insights engine</span><span style="font-size:11px;color:#22875C;font-weight:600;margin-left:auto;white-space:nowrap;">P1 · Live</span></div>
-          <div style="display:flex;align-items:center;gap:8px;"><span style="width:8px;height:8px;border-radius:50%;background:#6491C0;flex-shrink:0;display:inline-block;"></span><span style="font-size:13px;color:var(--ink);">Goal setting per client</span><span style="font-size:11px;color:var(--muted);margin-left:auto;white-space:nowrap;">P2</span></div>
-          <div style="display:flex;align-items:center;gap:8px;"><span style="width:8px;height:8px;border-radius:50%;background:#6491C0;flex-shrink:0;display:inline-block;"></span><span style="font-size:13px;color:var(--ink);">PDF session export</span><span style="font-size:11px;color:var(--muted);margin-left:auto;white-space:nowrap;">P2</span></div>
-          <div style="display:flex;align-items:center;gap:8px;"><span style="width:8px;height:8px;border-radius:50%;background:#6491C0;flex-shrink:0;display:inline-block;"></span><span style="font-size:13px;color:var(--ink);">Home practice + sync</span><span style="font-size:11px;color:var(--muted);margin-left:auto;white-space:nowrap;">P2</span></div>
-        </div>
-      </div>
-
-      <!-- Q2: High impact, High effort -->
-      <div style="grid-column:3;grid-row:2;background:rgba(254,220,0,.07);border:1px solid rgba(201,125,16,.25);border-left:none;border-radius:0 10px 0 0;padding:16px 18px;">
-        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#C97D10;margin-bottom:12px;">High impact · high effort — invest here</div>
-        <div style="display:flex;flex-direction:column;gap:8px;">
-          <div style="display:flex;align-items:center;gap:8px;"><span style="width:8px;height:8px;border-radius:50%;background:#FEDC00;border:1.5px solid #C97D10;flex-shrink:0;display:inline-block;"></span><span style="font-size:13px;color:var(--ink);">Natural language intake</span><span style="font-size:11px;color:var(--muted);margin-left:auto;white-space:nowrap;">P3</span></div>
-          <div style="display:flex;align-items:center;gap:8px;"><span style="width:8px;height:8px;border-radius:50%;background:#FEDC00;border:1.5px solid #C97D10;flex-shrink:0;display:inline-block;"></span><span style="font-size:13px;color:var(--ink);">Role-based access (5 tiers)</span><span style="font-size:11px;color:var(--muted);margin-left:auto;white-space:nowrap;">P3</span></div>
-          <div style="display:flex;align-items:center;gap:8px;"><span style="width:8px;height:8px;border-radius:50%;background:#FEDC00;border:1.5px solid #C97D10;flex-shrink:0;display:inline-block;"></span><span style="font-size:13px;color:var(--ink);">Network benchmarking</span><span style="font-size:11px;color:var(--muted);margin-left:auto;white-space:nowrap;">P4</span></div>
-          <div style="display:flex;align-items:center;gap:8px;"><span style="width:8px;height:8px;border-radius:50%;background:#FEDC00;border:1.5px solid #C97D10;flex-shrink:0;display:inline-block;"></span><span style="font-size:13px;color:var(--ink);">AI summaries (coded fallback)</span><span style="font-size:11px;color:var(--muted);margin-left:auto;white-space:nowrap;">P4</span></div>
-          <div style="display:flex;align-items:center;gap:8px;"><span style="width:8px;height:8px;border-radius:50%;background:#7C3AED;flex-shrink:0;display:inline-block;"></span><span style="font-size:13px;color:var(--ink);">Gaze heat maps</span><span style="font-size:11px;color:var(--muted);margin-left:auto;white-space:nowrap;">P5</span></div>
-          <div style="display:flex;align-items:center;gap:8px;"><span style="width:8px;height:8px;border-radius:50%;background:#7C3AED;flex-shrink:0;display:inline-block;"></span><span style="font-size:13px;color:var(--ink);font-weight:600;">Non-verbal gaze selection</span><span style="font-size:11px;color:var(--muted);margin-left:auto;white-space:nowrap;">P5</span></div>
-          <div style="display:flex;align-items:center;gap:8px;"><span style="width:8px;height:8px;border-radius:50%;background:#003361;flex-shrink:0;display:inline-block;"></span><span style="font-size:13px;color:var(--ink);font-weight:600;">NHS / FHIR integration</span><span style="font-size:11px;color:var(--muted);margin-left:auto;white-space:nowrap;">P6</span></div>
-        </div>
-      </div>
-
-      <!-- Q3: Low impact, Low effort -->
-      <div style="grid-column:2;grid-row:3;background:var(--faint);border:1px solid var(--border);border-top:none;border-radius:0 0 0 10px;padding:16px 18px;">
-        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:12px;">Lower priority · low effort — schedule in</div>
-        <div style="display:flex;flex-direction:column;gap:8px;">
-          <div style="display:flex;align-items:center;gap:8px;"><span style="width:8px;height:8px;border-radius:50%;background:var(--blue);opacity:.6;flex-shrink:0;display:inline-block;"></span><span style="font-size:13px;color:var(--muted);">Per-exercise difficulty override</span><span style="font-size:11px;color:var(--muted);margin-left:auto;white-space:nowrap;">P2</span></div>
-          <div style="display:flex;align-items:center;gap:8px;"><span style="width:8px;height:8px;border-radius:50%;background:var(--blue);opacity:.6;flex-shrink:0;display:inline-block;"></span><span style="font-size:13px;color:var(--muted);">Progress milestone celebrations</span><span style="font-size:11px;color:var(--muted);margin-left:auto;white-space:nowrap;">P2</span></div>
-        </div>
-      </div>
-
-      <!-- Q4: Low impact, High effort -->
-      <div style="grid-column:3;grid-row:3;background:var(--faint);border:1px solid var(--border);border-left:none;border-top:none;border-radius:0 0 10px 0;padding:16px 18px;">
-        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:12px;">Lower priority · high effort — plan carefully</div>
-        <div style="display:flex;flex-direction:column;gap:8px;">
-          <div style="display:flex;align-items:center;gap:8px;"><span style="width:8px;height:8px;border-radius:50%;background:#7C3AED;flex-shrink:0;display:inline-block;"></span><span style="font-size:13px;color:var(--muted);">Visual scanning exercises</span><span style="font-size:11px;color:var(--muted);margin-left:auto;white-space:nowrap;">P5</span></div>
-          <div style="display:flex;align-items:center;gap:8px;"><span style="width:8px;height:8px;border-radius:50%;background:var(--blue);flex-shrink:0;display:inline-block;"></span><span style="font-size:13px;color:var(--muted);">Adaptive real-time exercises</span><span style="font-size:11px;color:var(--muted);margin-left:auto;white-space:nowrap;">P6</span></div>
-          <div style="display:flex;align-items:center;gap:8px;"><span style="width:8px;height:8px;border-radius:50%;background:var(--blue);flex-shrink:0;display:inline-block;"></span><span style="font-size:13px;color:var(--muted);">Telehealth / remote session mode</span><span style="font-size:11px;color:var(--muted);margin-left:auto;white-space:nowrap;">P6</span></div>
-        </div>
-      </div>
-
-      <!-- X-axis label -->
-      <div style="grid-column:2/4;grid-row:4;text-align:center;padding:10px 0 0;font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);">← Difficulty →</div>
-    </div>
-
-    <!-- Legend -->
-    <div style="display:flex;flex-wrap:wrap;gap:16px;margin-top:16px;padding-top:14px;border-top:var(--line);">
-      <div style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted);"><span style="width:10px;height:10px;border-radius:50%;background:#22875C;display:inline-block;"></span>Live (Phase 1)</div>
-      <div style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted);"><span style="width:10px;height:10px;border-radius:50%;background:#6491C0;display:inline-block;"></span>Near-term (Phase 2)</div>
-      <div style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted);"><span style="width:10px;height:10px;border-radius:50%;background:#FEDC00;border:1.5px solid #C97D10;display:inline-block;"></span>Medium-term (Phases 3–4)</div>
-      <div style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted);"><span style="width:10px;height:10px;border-radius:50%;background:#7C3AED;display:inline-block;"></span>Future — Eye tracking (Phase 5)</div>
-      <div style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted);"><span style="width:10px;height:10px;border-radius:50%;background:#003361;display:inline-block;"></span>Vision (Phase 6)</div>
+    <div class="matrix-svg-container">
+      <svg viewBox="0 0 760 430" xmlns="http://www.w3.org/2000/svg" width="100%" style="max-width:760px;display:block;margin:0 auto;" aria-label="Impact vs Difficulty matrix">
+        <defs>
+          <marker id="ah" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+            <polygon points="0 0, 8 3, 0 6" fill="#8DA4BE"/>
+          </marker>
+        </defs>
+        <rect x="60" y="20" width="330" height="180" rx="6" fill="rgba(34,135,92,.06)"/>
+        <rect x="60" y="200" width="330" height="185" rx="6" fill="rgba(192,57,43,.04)"/>
+        <rect x="390" y="20" width="330" height="180" rx="6" fill="rgba(254,220,0,.08)"/>
+        <rect x="390" y="200" width="330" height="185" rx="6" fill="rgba(100,145,192,.06)"/>
+        <text x="75" y="42" font-size="10" font-weight="700" fill="#22875C" letter-spacing=".06em" font-family="system-ui,sans-serif">HIGH IMPACT · LOW EFFORT</text>
+        <text x="75" y="222" font-size="10" font-weight="700" fill="#C0392B" letter-spacing=".06em" font-family="system-ui,sans-serif">LOW IMPACT · LOW EFFORT</text>
+        <text x="405" y="42" font-size="10" font-weight="700" fill="#7a6200" letter-spacing=".06em" font-family="system-ui,sans-serif">HIGH IMPACT · HIGH EFFORT</text>
+        <text x="405" y="222" font-size="10" font-weight="700" fill="#6491C0" letter-spacing=".06em" font-family="system-ui,sans-serif">LOW IMPACT · HIGH EFFORT</text>
+        <line x1="60" y1="395" x2="720" y2="395" stroke="#8DA4BE" stroke-width="1.5" marker-end="url(#ah)"/>
+        <line x1="60" y1="395" x2="60" y2="15" stroke="#8DA4BE" stroke-width="1.5" marker-end="url(#ah)"/>
+        <line x1="60" y1="200" x2="715" y2="200" stroke="#8DA4BE" stroke-width="1" stroke-dasharray="4 3"/>
+        <line x1="375" y1="15" x2="375" y2="395" stroke="#8DA4BE" stroke-width="1" stroke-dasharray="4 3"/>
+        <text x="390" y="413" font-size="11" fill="#5A6A80" text-anchor="middle" font-family="system-ui,sans-serif">Difficulty →</text>
+        <text x="16" y="200" font-size="11" fill="#5A6A80" text-anchor="middle" font-family="system-ui,sans-serif" transform="rotate(-90,16,200)">Impact →</text>
+        <!-- Phase 1 -->
+        <g><circle cx="160" cy="65" r="6" fill="#22875C"/><text x="170" y="62" font-size="12" fill="#192030" font-family="system-ui,sans-serif" font-weight="700">Deficit-led setup</text><text x="170" y="75" font-size="11" fill="#3D5269" font-family="system-ui,sans-serif">Phase 1 · Live</text></g>
+        <g><circle cx="200" cy="100" r="6" fill="#22875C"/><text x="210" y="97" font-size="12" fill="#192030" font-family="system-ui,sans-serif" font-weight="700">Coded insights</text><text x="210" y="110" font-size="11" fill="#3D5269" font-family="system-ui,sans-serif">Phase 1 · Live</text></g>
+        <!-- Phase 2 -->
+        <g><circle cx="140" cy="130" r="6" fill="#6491C0"/><text x="150" y="127" font-size="12" fill="#192030" font-family="system-ui,sans-serif" font-weight="600">Goal setting</text><text x="150" y="140" font-size="11" fill="#3D5269" font-family="system-ui,sans-serif">Phase 2</text></g>
+        <g><circle cx="255" cy="78" r="6" fill="#6491C0"/><text x="265" y="75" font-size="12" fill="#192030" font-family="system-ui,sans-serif" font-weight="600">PDF export</text><text x="265" y="88" font-size="11" fill="#3D5269" font-family="system-ui,sans-serif">Phase 2</text></g>
+        <g><circle cx="175" cy="155" r="6" fill="#6491C0"/><text x="185" y="152" font-size="12" fill="#192030" font-family="system-ui,sans-serif" font-weight="600">Home practice + sync</text><text x="185" y="165" font-size="11" fill="#3D5269" font-family="system-ui,sans-serif">Phase 2</text></g>
+        <!-- Phase 3 -->
+        <g><circle cx="430" cy="55" r="6" fill="#FEDC00" stroke="#C97D10" stroke-width="1.5"/><text x="440" y="52" font-size="12" fill="#192030" font-family="system-ui,sans-serif" font-weight="600">NL intake / description matching</text><text x="440" y="65" font-size="11" fill="#3D5269" font-family="system-ui,sans-serif">Phase 3 · High payoff</text></g>
+        <g><circle cx="415" cy="100" r="6" fill="#FEDC00" stroke="#C97D10" stroke-width="1.5"/><text x="425" y="97" font-size="12" fill="#192030" font-family="system-ui,sans-serif" font-weight="600">Role-based access (5 tiers)</text><text x="425" y="110" font-size="11" fill="#3D5269" font-family="system-ui,sans-serif">Phase 3</text></g>
+        <g><circle cx="460" cy="140" r="6" fill="#FEDC00" stroke="#C97D10" stroke-width="1.5"/><text x="470" y="137" font-size="12" fill="#192030" font-family="system-ui,sans-serif" font-weight="600">Caseload dashboard</text><text x="470" y="150" font-size="11" fill="#3D5269" font-family="system-ui,sans-serif">Phase 3</text></g>
+        <!-- Phase 4 -->
+        <g><circle cx="590" cy="68" r="7" fill="#FEDC00" stroke="#C97D10" stroke-width="2"/><text x="602" y="65" font-size="12" fill="#192030" font-family="system-ui,sans-serif" font-weight="700">Network benchmarking</text><text x="602" y="78" font-size="11" fill="#3D5269" font-family="system-ui,sans-serif">Phase 4 · Transformative</text></g>
+        <g><circle cx="570" cy="115" r="6" fill="#FEDC00" stroke="#C97D10" stroke-width="1.5"/><text x="580" y="112" font-size="12" fill="#192030" font-family="system-ui,sans-serif" font-weight="600">AI summaries (w/ fallback)</text><text x="580" y="125" font-size="11" fill="#3D5269" font-family="system-ui,sans-serif">Phase 4</text></g>
+        <!-- Phase 5 eye tracking -->
+        <g><circle cx="500" cy="50" r="6" fill="#7C3AED"/><text x="510" y="47" font-size="12" fill="#192030" font-family="system-ui,sans-serif" font-weight="600">Gaze heat maps</text><text x="510" y="60" font-size="11" fill="#3D5269" font-family="system-ui,sans-serif">Phase 5</text></g>
+        <g><circle cx="625" cy="88" r="7" fill="#7C3AED" stroke="#5B21B6" stroke-width="1.5"/><text x="636" y="85" font-size="12" fill="#192030" font-family="system-ui,sans-serif" font-weight="700">Non-verbal gaze selection</text><text x="636" y="98" font-size="11" fill="#3D5269" font-family="system-ui,sans-serif">Phase 5 · High impact</text></g>
+        <g><circle cx="540" cy="158" r="6" fill="#7C3AED"/><text x="550" y="155" font-size="12" fill="#192030" font-family="system-ui,sans-serif" font-weight="600">Visual scanning exercises</text><text x="550" y="168" font-size="11" fill="#3D5269" font-family="system-ui,sans-serif">Phase 5</text></g>
+        <!-- Phase 6 -->
+        <g><circle cx="680" cy="42" r="8" fill="#003361"/><text x="692" y="39" font-size="12" fill="#192030" font-family="system-ui,sans-serif" font-weight="700">NHS / FHIR integration</text><text x="692" y="52" font-size="11" fill="#3D5269" font-family="system-ui,sans-serif">Phase 6 · Vision</text></g>
+        <g><circle cx="660" cy="135" r="6" fill="#6491C0"/><text x="670" y="132" font-size="12" fill="#192030" font-family="system-ui,sans-serif" font-weight="600">Adaptive exercises</text><text x="670" y="145" font-size="11" fill="#3D5269" font-family="system-ui,sans-serif">Phase 6</text></g>
+        <!-- Lower quadrant -->
+        <g><circle cx="280" cy="285" r="6" fill="#6491C0" opacity=".6"/><text x="290" y="282" font-size="12" fill="#3D5269" font-family="system-ui,sans-serif">Per-exercise difficulty</text><text x="290" y="295" font-size="11" fill="#5A6A80" font-family="system-ui,sans-serif">Phase 2 · Nice to have</text></g>
+        <g><circle cx="510" cy="305" r="6" fill="#6491C0" opacity=".5"/><text x="520" y="302" font-size="12" fill="#3D5269" font-family="system-ui,sans-serif">Telehealth mode</text><text x="520" y="315" font-size="11" fill="#5A6A80" font-family="system-ui,sans-serif">Phase 6</text></g>
+        <!-- Legend -->
+        <g transform="translate(62,360)">
+          <circle cx="5" cy="5" r="5" fill="#22875C"/><text x="14" y="9" font-size="12" fill="#3D5269" font-family="system-ui,sans-serif">Live</text>
+          <circle cx="48" cy="5" r="5" fill="#6491C0"/><text x="57" y="9" font-size="12" fill="#3D5269" font-family="system-ui,sans-serif">Near-term</text>
+          <circle cx="138" cy="5" r="5" fill="#FEDC00" stroke="#C97D10" stroke-width="1.5"/><text x="147" y="9" font-size="12" fill="#3D5269" font-family="system-ui,sans-serif">High-value / complex</text>
+          <circle cx="282" cy="5" r="5" fill="#7C3AED"/><text x="291" y="9" font-size="12" fill="#3D5269" font-family="system-ui,sans-serif">Eye tracking</text>
+          <circle cx="360" cy="5" r="5" fill="#003361"/><text x="369" y="9" font-size="12" fill="#3D5269" font-family="system-ui,sans-serif">Vision</text>
+        </g>
+      </svg>
     </div>
   </div>
 
