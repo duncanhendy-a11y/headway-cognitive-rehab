@@ -16,12 +16,14 @@ import {
   Brain,
   WifiHigh,
   WifiSlash,
+  MapTrifold,
 } from '@phosphor-icons/react';
 import { useEffect, useState } from 'react';
 
 const navItems = [
-  { to: '/dashboard', icon: HouseSimple, label: 'Dashboard' },
-  { to: '/help',      icon: Question,    label: 'Help' },
+  { to: '/dashboard', icon: HouseSimple,  label: 'Dashboard' },
+  { to: '/roadmap',   icon: MapTrifold,   label: 'Roadmap' },
+  { to: '/help',      icon: Question,     label: 'Help' },
 ];
 
 export function AppLayout() {

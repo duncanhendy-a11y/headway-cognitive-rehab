@@ -10,6 +10,7 @@ import { ClientExerciseViewPage } from '@/pages/ClientExerciseViewPage';
 import { PostSessionNotesPage } from '@/pages/PostSessionNotesPage';
 import { SessionReportPage } from '@/pages/SessionReportPage';
 import { HelpPage } from '@/pages/HelpPage';
+import { RoadmapPage } from '@/pages/RoadmapPage';
 import { Toaster } from '@/components/ui/sonner';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { useEffect, useRef } from 'react';
@@ -55,6 +56,7 @@ export default function App() {
               <Route path="clients/:clientId" element={<ClientProfilePage />} />
               <Route path="session/setup" element={<SessionSetupPage />} />
               <Route path="session/:sessionId/report" element={<SessionReportPage />} />
+              <Route path="roadmap" element={<RoadmapPage />} />
               <Route path="help" element={<HelpPage />} />
             </Route>
 

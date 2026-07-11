@@ -1,0 +1,501 @@
+
+<title>Headway Cognitive Rehab — Product Roadmap</title>
+<style>
+  :root {
+    --bg:      #F8FAFC;
+    --surface: #FFFFFF;
+    --border:  #DDE6F0;
+    --ink:     #192030;
+    --muted:   #5A6A80;
+    --faint:   #EEF3FA;
+    --navy:    #003361;
+    --gold:    #FEDC00;
+    --blue:    #6491C0;
+    --blue-lt: #EEF3FA;
+    --green:   #22875C;
+    --amber:   #C97D10;
+    --line:    1px solid var(--border);
+    --radius:  10px;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg:#0E1520; --surface:#1A2535; --border:#263448; --ink:#E8EFF8; --muted:#8DA4BE; --faint:#1E2D42; --blue-lt:#1E2D42; }
+  }
+  :root[data-theme="light"] { --bg:#F8FAFC; --surface:#FFFFFF; --border:#DDE6F0; --ink:#192030; --muted:#5A6A80; --faint:#EEF3FA; --blue-lt:#EEF3FA; }
+  :root[data-theme="dark"]  { --bg:#0E1520; --surface:#1A2535; --border:#263448; --ink:#E8EFF8; --muted:#8DA4BE; --faint:#1E2D42; --blue-lt:#1E2D42; }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: var(--ink); font-size: 15px; line-height: 1.65; -webkit-font-smoothing: antialiased; }
+
+  .page { max-width: 860px; margin: 0 auto; padding: 48px 32px 96px; }
+
+  .doc-header { border-bottom: 3px solid var(--navy); padding-bottom: 32px; margin-bottom: 48px; }
+  .eyebrow { font-size: 11px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--blue); display: flex; align-items: center; gap: 10px; margin-bottom: 16px; }
+  .eyebrow::before { content: ''; display: inline-block; width: 28px; height: 2px; background: var(--gold); flex-shrink: 0; }
+  h1 { font-family: Georgia, serif; font-size: clamp(28px, 5vw, 42px); font-weight: 700; line-height: 1.1; color: var(--navy); text-wrap: balance; margin-bottom: 16px; }
+  @media (prefers-color-scheme: dark) { h1 { color: #9DC0E0; } }
+  :root[data-theme="dark"] h1 { color: #9DC0E0; }
+  :root[data-theme="light"] h1 { color: var(--navy); }
+  .doc-meta { display: flex; gap: 24px; flex-wrap: wrap; margin-top: 20px; }
+  .doc-meta-item { font-size: 12px; color: var(--muted); }
+  .doc-meta-item strong { display: block; color: var(--ink); font-size: 13px; margin-bottom: 1px; }
+
+  .intro { display: grid; grid-template-columns: 3fr 2fr; gap: 32px; margin-bottom: 56px; align-items: start; }
+  @media (max-width: 600px) { .intro { grid-template-columns: 1fr; } }
+  .intro-copy p { color: var(--muted); font-size: 15px; margin-bottom: 12px; max-width: 52ch; }
+  .intro-copy p:first-child { font-size: 16px; color: var(--ink); font-weight: 450; }
+  .status-card { background: var(--surface); border: var(--line); border-radius: var(--radius); padding: 20px; border-left: 3px solid var(--green); }
+  .status-card h3 { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .1em; color: var(--green); margin-bottom: 12px; }
+  .status-item { display: flex; align-items: flex-start; gap: 8px; margin-bottom: 8px; font-size: 13px; color: var(--muted); }
+  .status-item::before { content: '✓'; color: var(--green); font-weight: 700; flex-shrink: 0; margin-top: 1px; }
+
+  .section-title { font-family: Georgia, serif; font-size: 22px; font-weight: 700; color: var(--navy); margin-bottom: 6px; text-wrap: balance; }
+  @media (prefers-color-scheme: dark) { .section-title { color: #9DC0E0; } }
+  :root[data-theme="dark"] .section-title { color: #9DC0E0; }
+  :root[data-theme="light"] .section-title { color: var(--navy); }
+  .section-intro { color: var(--muted); font-size: 14px; margin-bottom: 32px; max-width: 60ch; }
+
+  .timeline { position: relative; margin-bottom: 64px; }
+  .timeline::before { content: ''; position: absolute; left: 19px; top: 12px; bottom: 12px; width: 2px; background: linear-gradient(to bottom, var(--blue), transparent); opacity: .3; }
+
+  .phase { display: flex; gap: 24px; margin-bottom: 36px; position: relative; }
+  .phase-dot { width: 40px; height: 40px; border-radius: 50%; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; z-index: 1; margin-top: 2px; }
+  .phase-dot.live    { background: var(--green); color: #fff; }
+  .phase-dot.near    { background: var(--blue);  color: #fff; }
+  .phase-dot.mid     { background: var(--navy);  color: var(--gold); }
+  .phase-dot.horizon { background: var(--faint); color: var(--blue); border: 2px dashed var(--blue); }
+  .phase-dot.vision  { background: var(--gold);  color: var(--navy); }
+
+  .phase-body { flex: 1; background: var(--surface); border: var(--line); border-radius: var(--radius); padding: 22px 24px; transition: box-shadow .15s; }
+  .phase-body:hover { box-shadow: 0 4px 20px rgba(0,51,97,.08); }
+  .phase-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-bottom: 10px; flex-wrap: wrap; }
+  .phase-name { font-family: Georgia, serif; font-size: 17px; font-weight: 700; color: var(--ink); line-height: 1.2; }
+  .phase-timeline { font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; white-space: nowrap; padding: 3px 10px; border-radius: 20px; flex-shrink: 0; }
+  .tag-live    { background: rgba(34,135,92,.12); color: var(--green); }
+  .tag-near    { background: var(--blue-lt);       color: var(--blue);  }
+  .tag-mid     { background: rgba(0,51,97,.08);    color: var(--navy);  }
+  .tag-horizon { background: var(--faint);          color: var(--muted); }
+  .tag-vision  { background: rgba(254,220,0,.18);  color: #7a6200;     }
+  @media (prefers-color-scheme: dark) { .tag-vision { color: #BFA200; } }
+  :root[data-theme="dark"] .tag-vision { color: #BFA200; }
+  .phase-desc { font-size: 14px; color: var(--muted); margin-bottom: 16px; max-width: 60ch; }
+
+  .features { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  @media (max-width: 540px) { .features { grid-template-columns: 1fr; } }
+  .feature { display: flex; gap: 8px; align-items: flex-start; font-size: 13px; color: var(--ink); }
+  .feature-dot { width: 6px; height: 6px; border-radius: 50%; margin-top: 5px; flex-shrink: 0; background: var(--blue); }
+
+  /* Role table */
+  .role-table { width: 100%; border-collapse: collapse; margin-top: 16px; font-size: 13px; }
+  .role-table th { text-align: left; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); padding: 6px 10px; border-bottom: 2px solid var(--border); }
+  .role-table td { padding: 9px 10px; border-bottom: var(--line); vertical-align: top; }
+  .role-table tr:last-child td { border-bottom: none; }
+  .role-name { font-weight: 600; color: var(--ink); white-space: nowrap; }
+  .role-sees { color: var(--muted); }
+  .role-badge { display: inline-block; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .07em; padding: 2px 7px; border-radius: 10px; margin-bottom: 3px; }
+  .rb-kw  { background: rgba(34,135,92,.1);  color: #22875C; }
+  .rb-cl  { background: rgba(100,145,192,.15); color: var(--blue); }
+  .rb-cm  { background: rgba(0,51,97,.1);    color: var(--navy); }
+  .rb-na  { background: rgba(254,220,0,.2);  color: #7a6200; }
+  .rb-res { background: rgba(124,58,237,.1); color: #7C3AED; }
+  @media (prefers-color-scheme: dark) { .rb-na { color: #BFA200; } }
+  :root[data-theme="dark"] .rb-na { color: #BFA200; }
+
+  .impact-bar { display: flex; align-items: center; gap: 10px; margin-top: 16px; padding-top: 14px; border-top: var(--line); }
+  .impact-label { font-size: 11px; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); font-weight: 600; width: 56px; flex-shrink: 0; }
+  .impact-pills { display: flex; gap: 4px; }
+  .pill { width: 22px; height: 8px; border-radius: 4px; }
+  .pill-filled { background: var(--blue); }
+  .pill-empty  { background: var(--border); }
+  .pill-gold   { background: var(--gold); }
+
+  .note-box { background: rgba(254,220,0,.1); border-left: 3px solid var(--gold); border-radius: 0 8px 8px 0; padding: 14px 18px; margin-bottom: 32px; font-size: 13.5px; color: var(--ink); line-height: 1.6; }
+  @media (prefers-color-scheme: dark) { .note-box { background: rgba(254,220,0,.07); } }
+  :root[data-theme="dark"] .note-box { background: rgba(254,220,0,.07); }
+
+  .matrix-wrap { margin-bottom: 64px; }
+  .matrix-svg-container { background: var(--surface); border: var(--line); border-radius: var(--radius); padding: 24px; overflow-x: auto; }
+
+  .vision-block { background: var(--navy); color: #fff; border-radius: var(--radius); padding: 40px 40px 36px; margin-bottom: 48px; position: relative; overflow: hidden; }
+  .vision-block::after { content: ''; position: absolute; bottom: -30px; right: -30px; width: 160px; height: 160px; border-radius: 50%; background: rgba(254,220,0,.08); pointer-events: none; }
+  .vision-block h2 { font-family: Georgia, serif; font-size: 22px; color: var(--gold); margin-bottom: 12px; text-wrap: balance; }
+  .vision-block p { font-size: 15px; color: rgba(255,255,255,.8); max-width: 60ch; margin-bottom: 10px; line-height: 1.7; }
+  .principles { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 24px; }
+  @media (max-width: 600px) { .principles { grid-template-columns: 1fr; } }
+  .principle { background: rgba(255,255,255,.07); border-radius: 8px; padding: 16px; }
+  .principle-label { font-size: 11px; text-transform: uppercase; letter-spacing: .1em; color: var(--gold); font-weight: 700; margin-bottom: 6px; display: block; }
+  .principle p { font-size: 13px; color: rgba(255,255,255,.7); margin: 0; }
+
+  .doc-footer { border-top: var(--line); padding-top: 24px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; }
+  .doc-footer p { font-size: 12px; color: var(--muted); }
+  .headway-badge { display: inline-flex; align-items: center; gap: 8px; background: var(--navy); color: #fff; padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: 600; letter-spacing: .03em; }
+  .headway-badge span { display: inline-block; width: 10px; height: 10px; background: var(--gold); border-radius: 50%; }
+
+  .section-divider { margin: 48px 0 40px; display: flex; align-items: center; gap: 16px; }
+  .section-divider::before, .section-divider::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+  .section-divider-label { font-size: 11px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); white-space: nowrap; }
+</style>
+
+<div class="page">
+
+  <header class="doc-header">
+    <div class="eyebrow">Headway Cognitive Rehabilitation Tool · Product Roadmap</div>
+    <h1>From session tracker<br>to clinical intelligence platform</h1>
+    <div class="doc-meta">
+      <div class="doc-meta-item"><strong>Version</strong>1.3 — Phase 1 live</div>
+      <div class="doc-meta-item"><strong>Date</strong>July 2026</div>
+      <div class="doc-meta-item"><strong>Audience</strong>Headway leadership, key workers, clinical team</div>
+      <div class="doc-meta-item"><strong>Prepared by</strong>Duncan Hendy</div>
+    </div>
+  </header>
+
+  <section class="intro">
+    <div class="intro-copy">
+      <p>This roadmap describes a path from a working session tool to a network-wide clinical intelligence platform — built around how Headway key workers actually think and talk about their clients.</p>
+      <p>The foundation is already live. The architecture has been deliberately kept simple, robust, and free of external AI dependencies, so every improvement compounds on something stable.</p>
+      <p>Phases are ordered by the ratio of impact to difficulty. High-value, low-effort wins come first. The longer-horizon features are more ambitious — but by the time we reach them, we'll have the data, the trust, and the relationships to make them land properly.</p>
+    </div>
+    <div class="status-card">
+      <h3>Phase 1 · Live now</h3>
+      <div class="status-item">Deficit-led session setup — therapist picks the cognitive area, exercises are auto-assigned</div>
+      <div class="status-item">Rule-based insight engine — plateau alerts, regression detection, domain analysis</div>
+      <div class="status-item">Client profiles with domain radar charts</div>
+      <div class="status-item">Session reports with per-exercise breakdowns</div>
+      <div class="status-item">Offline-capable PWA — works in low-connectivity settings</div>
+    </div>
+  </section>
+
+  <div class="note-box">
+    <strong>Design principle across all phases:</strong> every feature must work for a Headway key worker at the end of a long shift, on a shared tablet, with a client who has limited patience for complexity. If it needs a training manual, we haven't finished it yet.
+  </div>
+
+  <div class="section-title">The roadmap</div>
+  <p class="section-intro">Six phases, ordered by impact-to-difficulty ratio. Each phase is independently useful — we're not waiting for the full picture to deliver value.</p>
+
+  <div class="timeline">
+
+    <!-- Phase 1 -->
+    <div class="phase">
+      <div class="phase-dot live">1</div>
+      <div class="phase-body">
+        <div class="phase-header">
+          <div class="phase-name">Deficit-led sessions + coded insights</div>
+          <span class="phase-timeline tag-live">Live</span>
+        </div>
+        <p class="phase-desc">The shift from exercise-picker to cognitive-domain-led setup is the most important UX decision in the product. Key workers think in deficits — "she has trouble with working memory" — not exercise types. The app now thinks that way too.</p>
+        <div class="features">
+          <div class="feature"><div class="feature-dot"></div>Domain selection → exercises auto-assigned</div>
+          <div class="feature"><div class="feature-dot"></div>Plateau detection (±10% over 3 sessions)</div>
+          <div class="feature"><div class="feature-dot"></div>Regression alerts (&gt;15% drop, flagged for review)</div>
+          <div class="feature"><div class="feature-dot"></div>Domain strength analysis across all sessions</div>
+          <div class="feature"><div class="feature-dot"></div>Difficulty recommendations based on trends</div>
+          <div class="feature"><div class="feature-dot"></div>Zero AI dependency — always works offline</div>
+        </div>
+        <div class="impact-bar">
+          <div class="impact-label">Impact</div>
+          <div class="impact-pills"><div class="pill pill-filled"></div><div class="pill pill-filled"></div><div class="pill pill-filled"></div><div class="pill pill-filled"></div><div class="pill pill-empty"></div></div>
+          <div class="impact-label" style="margin-left:8px">Effort</div>
+          <div class="impact-pills"><div class="pill pill-filled"></div><div class="pill pill-filled"></div><div class="pill pill-empty"></div><div class="pill pill-empty"></div><div class="pill pill-empty"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Phase 2 -->
+    <div class="phase">
+      <div class="phase-dot near">2</div>
+      <div class="phase-body">
+        <div class="phase-header">
+          <div class="phase-name">Goals, templates, export &amp; home practice</div>
+          <span class="phase-timeline tag-near">Near-term</span>
+        </div>
+        <p class="phase-desc">The missing layer between "session data" and "meaningful care record." Connecting exercises to goals makes progress legible to the client, the family, and the wider MDT. Home practice means rehabilitation doesn't stop when the session ends — and syncs back to the same record.</p>
+        <div class="features">
+          <div class="feature"><div class="feature-dot"></div>Goal setting per client (e.g. "return to independent cooking")</div>
+          <div class="feature"><div class="feature-dot"></div>Link sessions to specific goals — show progress visually</div>
+          <div class="feature"><div class="feature-dot"></div>Session plan templates by deficit profile (post-stroke, TBI, etc.)</div>
+          <div class="feature"><div class="feature-dot"></div>PDF session report — one-click, print-ready for MDT folders</div>
+          <div class="feature"><div class="feature-dot"></div>Per-exercise difficulty (override session-level setting)</div>
+          <div class="feature"><div class="feature-dot"></div>Progress milestone celebrations for clients</div>
+          <div class="feature"><div class="feature-dot"></div>Home practice mode — key worker prescribes domains and difficulty for independent use</div>
+          <div class="feature"><div class="feature-dot"></div>Client access via PIN or magic link — no account, no password, time-limited token</div>
+          <div class="feature"><div class="feature-dot"></div>Cross-platform home access — any Android or iOS device the client owns</div>
+          <div class="feature"><div class="feature-dot"></div>Home sessions sync to database, tagged as "home practice" in the client profile</div>
+          <div class="feature"><div class="feature-dot"></div>Key worker sees compliance — which home sessions were completed and when</div>
+        </div>
+        <div class="impact-bar">
+          <div class="impact-label">Impact</div>
+          <div class="impact-pills"><div class="pill pill-filled"></div><div class="pill pill-filled"></div><div class="pill pill-filled"></div><div class="pill pill-filled"></div><div class="pill pill-filled"></div></div>
+          <div class="impact-label" style="margin-left:8px">Effort</div>
+          <div class="impact-pills"><div class="pill pill-filled"></div><div class="pill pill-filled"></div><div class="pill pill-empty"></div><div class="pill pill-empty"></div><div class="pill pill-empty"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Phase 3 -->
+    <div class="phase">
+      <div class="phase-dot mid">3</div>
+      <div class="phase-body">
+        <div class="phase-header">
+          <div class="phase-name">Natural language intake + role-based access</div>
+          <span class="phase-timeline tag-mid">Medium-term</span>
+        </div>
+        <p class="phase-desc">Every Headway key worker describes a client differently. This phase makes the app understand all of them — plain language, charity terminology, or clinical shorthand. It also introduces a proper permission model: every role sees exactly what they need, nothing more.</p>
+        <div class="features">
+          <div class="feature"><div class="feature-dot"></div>Free-text intake: describe the client's difficulties in plain words</div>
+          <div class="feature"><div class="feature-dot"></div>AI maps description to cognitive domains + suggests session plan</div>
+          <div class="feature"><div class="feature-dot"></div>Works with any terminology — lay, clinical, or charity-specific</div>
+          <div class="feature"><div class="feature-dot"></div>Key worker reviews and adjusts before the suggestion is accepted</div>
+          <div class="feature"><div class="feature-dot"></div>Session notes search, tagging, and flagging</div>
+          <div class="feature"><div class="feature-dot"></div>AI always has a coded fallback — never a blank screen</div>
+          <div class="feature"><div class="feature-dot"></div>Client sharing — key worker can share specific clients with a named colleague for cover, handover, or co-working</div>
+          <div class="feature"><div class="feature-dot"></div>Shared access is per-client, time-limited or permanent, and revocable — colleague sees only those clients, nothing else</div>
+        </div>
+
+        <div style="margin-top: 20px; padding-top: 16px; border-top: var(--line);">
+          <p style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); margin-bottom: 12px;">Role-based access — five tiers</p>
+          <div style="overflow-x: auto;">
+            <table class="role-table">
+              <thead>
+                <tr>
+                  <th>Role</th>
+                  <th>What they can see and do</th>
+                  <th>What they cannot</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><span class="role-badge rb-kw">Key Worker</span><br><span class="role-name">Primary user</span></td>
+                  <td class="role-sees">Their own clients only. Run sessions, view history, write notes, set goals, share home practice links. Can share specific clients with named colleagues — for cover, handover, or co-working. The colleague gets full access to only those shared clients.</td>
+                  <td class="role-sees">Any client not assigned or explicitly shared to them.</td>
+                </tr>
+                <tr>
+                  <td><span class="role-badge rb-cl">Clinical Lead</span><br><span class="role-name">Supervisor</span></td>
+                  <td class="role-sees">Read-only view of all clients at their centre. Adds supervisory notes. Reviews session quality. Flags concerns.</td>
+                  <td class="role-sees">Cannot run sessions or edit a key worker's notes.</td>
+                </tr>
+                <tr>
+                  <td><span class="role-badge rb-cm">Centre Manager</span><br><span class="role-name">Operations</span></td>
+                  <td class="role-sees">Aggregate stats for their centre: sessions this month, active clients, domains worked, staff activity. No individual client data.</td>
+                  <td class="role-sees">Cannot see any individual client record or session detail.</td>
+                </tr>
+                <tr>
+                  <td><span class="role-badge rb-na">National Admin</span><br><span class="role-name">Headway HQ</span></td>
+                  <td class="role-sees">Cross-centre aggregate benchmarking and reports. User management — add or remove key workers across centres.</td>
+                  <td class="role-sees">Zero individual client data from any centre.</td>
+                </tr>
+                <tr>
+                  <td><span class="role-badge rb-res">Researcher</span><br><span class="role-name">Phase 6</span></td>
+                  <td class="role-sees">Anonymised data export only. No names, no identifiers, no session notes — aggregate patterns only.</td>
+                  <td class="role-sees">Any identifiable information whatsoever.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="impact-bar">
+          <div class="impact-label">Impact</div>
+          <div class="impact-pills"><div class="pill pill-gold"></div><div class="pill pill-gold"></div><div class="pill pill-gold"></div><div class="pill pill-gold"></div><div class="pill pill-gold"></div></div>
+          <div class="impact-label" style="margin-left:8px">Effort</div>
+          <div class="impact-pills"><div class="pill pill-filled"></div><div class="pill pill-filled"></div><div class="pill pill-filled"></div><div class="pill pill-empty"></div><div class="pill pill-empty"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Phase 4 -->
+    <div class="phase">
+      <div class="phase-dot horizon">4</div>
+      <div class="phase-body">
+        <div class="phase-header">
+          <div class="phase-name">Network benchmarking + adaptive AI</div>
+          <span class="phase-timeline tag-horizon">Longer-term</span>
+        </div>
+        <p class="phase-desc">Once multiple Headway centres are using the tool, the aggregate (fully anonymised) data becomes its own clinical asset. A key worker will be able to see how their client compares to others at the same stage of recovery. The AI layer also returns here, with robust coded fallbacks so it never fails silently.</p>
+        <div class="features">
+          <div class="feature"><div class="feature-dot"></div>Anonymised population benchmarking across Headway network</div>
+          <div class="feature"><div class="feature-dot"></div>"Clients like this" recovery trajectory comparisons</div>
+          <div class="feature"><div class="feature-dot"></div>AI session summaries — natural language, contextually aware</div>
+          <div class="feature"><div class="feature-dot"></div>Coded insights as permanent fallback (never breaks)</div>
+          <div class="feature"><div class="feature-dot"></div>Exercise recommendations based on population + individual data</div>
+          <div class="feature"><div class="feature-dot"></div>Automated progress reports for MDT handover</div>
+          <div class="feature"><div class="feature-dot"></div>Multi-centre deployment with centre-level reporting</div>
+        </div>
+        <div class="impact-bar">
+          <div class="impact-label">Impact</div>
+          <div class="impact-pills"><div class="pill pill-gold"></div><div class="pill pill-gold"></div><div class="pill pill-gold"></div><div class="pill pill-gold"></div><div class="pill pill-gold"></div></div>
+          <div class="impact-label" style="margin-left:8px">Effort</div>
+          <div class="impact-pills"><div class="pill pill-filled"></div><div class="pill pill-filled"></div><div class="pill pill-filled"></div><div class="pill pill-filled"></div><div class="pill pill-empty"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Phase 5 — Eye Tracking -->
+    <div class="phase">
+      <div class="phase-dot horizon">5</div>
+      <div class="phase-body">
+        <div class="phase-header">
+          <div class="phase-name">Eye tracking — gaze heat maps &amp; non-verbal access</div>
+          <span class="phase-timeline tag-horizon">Future</span>
+        </div>
+        <p class="phase-desc">A front camera understands where a person is looking. This phase uses that to generate attention heat maps during exercises — showing which parts of the screen a client engaged with, which they avoided, and how that changes over time. Since clients may use the app at home on their own device (Android or iOS), eye tracking follows them there too. For clients who cannot communicate verbally or by touch, gaze becomes the interface.</p>
+        <div class="features">
+          <div class="feature"><div class="feature-dot"></div>Gaze heat maps overlaid on session exercises — see exactly where attention was focused</div>
+          <div class="feature"><div class="feature-dot"></div>Hemispatial neglect detection — flag if client consistently ignores one screen half</div>
+          <div class="feature"><div class="feature-dot"></div>Device calibration (one-time, ~2 min) — adapts to any Android or iOS hardware, stored locally</div>
+          <div class="feature"><div class="feature-dot"></div>Client calibration (per session, 45 sec) — 5-dot sequence for individual gaze differences</div>
+          <div class="feature"><div class="feature-dot"></div>Confidence scoring — low-quality calibration disables gaze selection and marks heat maps approximate</div>
+          <div class="feature"><div class="feature-dot"></div>MediaPipe Iris — cross-platform, in-browser ML; iOS 18 native Eye Tracking activates as a higher-accuracy upgrade</div>
+          <div class="feature"><div class="feature-dot"></div>Visual scanning exercise type — gaze-led, no touch required</div>
+          <div class="feature"><div class="feature-dot"></div>Dwell-to-select: look at an option for 2 seconds to choose it (non-verbal clients)</div>
+          <div class="feature"><div class="feature-dot"></div>Blink detection — 400–600ms threshold distinguishes deliberate from involuntary blinks</div>
+          <div class="feature"><div class="feature-dot"></div>Large-target AAC-style interface — works on clinic tablet and client's home device</div>
+          <div class="feature"><div class="feature-dot"></div>Gaze heat maps sync to database — visible in client profile regardless of which device was used</div>
+        </div>
+        <div style="background: rgba(124,58,237,.07); border-left: 3px solid #7C3AED; border-radius: 0 8px 8px 0; padding: 12px 14px; margin: 14px 0; font-size: 13px; color: var(--ink); line-height: 1.6;">
+          <strong style="color: #7C3AED;">Android primary, iOS supported:</strong> MediaPipe Iris (Google open-source ML, runs in-browser via WebAssembly) works on any device with a front camera. On iOS 18+, the native Eye Tracking API activates automatically as a higher-accuracy layer. Because Headway centres use a variety of Android tablets and clients may use their own devices at home, a two-tier calibration system adapts to each device — <strong>device calibration</strong> (one-time, maps camera to screen) and <strong>client calibration</strong> (per session, accounts for sitting position and individual differences). Clinical-grade eye movement disorder diagnosis (Tobii hardware) is out of scope.
+        </div>
+        <div class="impact-bar">
+          <div class="impact-label">Impact</div>
+          <div class="impact-pills"><div class="pill pill-gold"></div><div class="pill pill-gold"></div><div class="pill pill-gold"></div><div class="pill pill-gold"></div><div class="pill pill-gold"></div></div>
+          <div class="impact-label" style="margin-left:8px">Effort</div>
+          <div class="impact-pills"><div class="pill pill-filled"></div><div class="pill pill-filled"></div><div class="pill pill-filled"></div><div class="pill pill-filled"></div><div class="pill pill-filled"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Phase 6 -->
+    <div class="phase">
+      <div class="phase-dot vision">6</div>
+      <div class="phase-body">
+        <div class="phase-header">
+          <div class="phase-name">Research &amp; NHS integration</div>
+          <span class="phase-timeline tag-vision">Vision</span>
+        </div>
+        <p class="phase-desc">If the first five phases are done well, the tool will have generated one of the largest longitudinal datasets of brain injury rehabilitation outcomes in the UK. That data — properly consented, properly anonymised — is the basis for research partnerships, NHS commissioning conversations, and a new evidence base for cognitive rehabilitation.</p>
+        <div class="features">
+          <div class="feature"><div class="feature-dot"></div>Research data export for academic partnerships (Researcher role)</div>
+          <div class="feature"><div class="feature-dot"></div>NHS FHIR-compatible data model (if integration pursued)</div>
+          <div class="feature"><div class="feature-dot"></div>Adaptive exercises that adjust in real-time to performance</div>
+          <div class="feature"><div class="feature-dot"></div>Remote/telehealth session mode</div>
+          <div class="feature"><div class="feature-dot"></div>Outcome reporting for charity commissioning</div>
+        </div>
+        <div class="impact-bar">
+          <div class="impact-label">Impact</div>
+          <div class="impact-pills"><div class="pill pill-gold"></div><div class="pill pill-gold"></div><div class="pill pill-gold"></div><div class="pill pill-gold"></div><div class="pill pill-gold"></div></div>
+          <div class="impact-label" style="margin-left:8px">Effort</div>
+          <div class="impact-pills"><div class="pill pill-filled"></div><div class="pill pill-filled"></div><div class="pill pill-filled"></div><div class="pill pill-filled"></div><div class="pill pill-filled"></div></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Matrix -->
+  <div class="section-divider"><div class="section-divider-label">Impact vs Difficulty</div></div>
+  <div class="matrix-wrap">
+    <div class="section-title">Feature priority map</div>
+    <p class="section-intro">Where each feature cluster sits. Work left-to-right — high-return investments first.</p>
+
+    <div style="display:grid;grid-template-columns:20px 1fr 1fr;grid-template-rows:auto 1fr 1fr auto;gap:0;margin-top:8px;">
+
+      <!-- Y-axis label -->
+      <div style="grid-column:1;grid-row:1/4;display:flex;align-items:center;justify-content:center;">
+        <span style="writing-mode:vertical-rl;transform:rotate(180deg);font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);">Impact →</span>
+      </div>
+
+      <!-- Column headers -->
+      <div style="grid-column:2;grid-row:1;padding:6px 12px 10px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);text-align:center;">Low effort</div>
+      <div style="grid-column:3;grid-row:1;padding:6px 12px 10px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);text-align:center;">High effort</div>
+
+      <!-- Q1: High impact, Low effort -->
+      <div style="grid-column:2;grid-row:2;background:rgba(34,135,92,.06);border:1px solid rgba(34,135,92,.2);border-radius:10px 0 0 0;padding:16px 18px;">
+        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#22875C;margin-bottom:12px;">High impact · low effort — do first</div>
+        <div style="display:flex;flex-direction:column;gap:8px;">
+          <div style="display:flex;align-items:center;gap:8px;"><span style="width:8px;height:8px;border-radius:50%;background:#22875C;flex-shrink:0;display:inline-block;"></span><span style="font-size:13px;color:var(--ink);font-weight:600;">Deficit-led session setup</span><span style="font-size:11px;color:#22875C;font-weight:600;margin-left:auto;white-space:nowrap;">P1 · Live</span></div>
+          <div style="display:flex;align-items:center;gap:8px;"><span style="width:8px;height:8px;border-radius:50%;background:#22875C;flex-shrink:0;display:inline-block;"></span><span style="font-size:13px;color:var(--ink);font-weight:600;">Coded insights engine</span><span style="font-size:11px;color:#22875C;font-weight:600;margin-left:auto;white-space:nowrap;">P1 · Live</span></div>
+          <div style="display:flex;align-items:center;gap:8px;"><span style="width:8px;height:8px;border-radius:50%;background:#6491C0;flex-shrink:0;display:inline-block;"></span><span style="font-size:13px;color:var(--ink);">Goal setting per client</span><span style="font-size:11px;color:var(--muted);margin-left:auto;white-space:nowrap;">P2</span></div>
+          <div style="display:flex;align-items:center;gap:8px;"><span style="width:8px;height:8px;border-radius:50%;background:#6491C0;flex-shrink:0;display:inline-block;"></span><span style="font-size:13px;color:var(--ink);">PDF session export</span><span style="font-size:11px;color:var(--muted);margin-left:auto;white-space:nowrap;">P2</span></div>
+          <div style="display:flex;align-items:center;gap:8px;"><span style="width:8px;height:8px;border-radius:50%;background:#6491C0;flex-shrink:0;display:inline-block;"></span><span style="font-size:13px;color:var(--ink);">Home practice + sync</span><span style="font-size:11px;color:var(--muted);margin-left:auto;white-space:nowrap;">P2</span></div>
+        </div>
+      </div>
+
+      <!-- Q2: High impact, High effort -->
+      <div style="grid-column:3;grid-row:2;background:rgba(254,220,0,.07);border:1px solid rgba(201,125,16,.25);border-left:none;border-radius:0 10px 0 0;padding:16px 18px;">
+        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#C97D10;margin-bottom:12px;">High impact · high effort — invest here</div>
+        <div style="display:flex;flex-direction:column;gap:8px;">
+          <div style="display:flex;align-items:center;gap:8px;"><span style="width:8px;height:8px;border-radius:50%;background:#FEDC00;border:1.5px solid #C97D10;flex-shrink:0;display:inline-block;"></span><span style="font-size:13px;color:var(--ink);">Natural language intake</span><span style="font-size:11px;color:var(--muted);margin-left:auto;white-space:nowrap;">P3</span></div>
+          <div style="display:flex;align-items:center;gap:8px;"><span style="width:8px;height:8px;border-radius:50%;background:#FEDC00;border:1.5px solid #C97D10;flex-shrink:0;display:inline-block;"></span><span style="font-size:13px;color:var(--ink);">Role-based access (5 tiers)</span><span style="font-size:11px;color:var(--muted);margin-left:auto;white-space:nowrap;">P3</span></div>
+          <div style="display:flex;align-items:center;gap:8px;"><span style="width:8px;height:8px;border-radius:50%;background:#FEDC00;border:1.5px solid #C97D10;flex-shrink:0;display:inline-block;"></span><span style="font-size:13px;color:var(--ink);">Network benchmarking</span><span style="font-size:11px;color:var(--muted);margin-left:auto;white-space:nowrap;">P4</span></div>
+          <div style="display:flex;align-items:center;gap:8px;"><span style="width:8px;height:8px;border-radius:50%;background:#FEDC00;border:1.5px solid #C97D10;flex-shrink:0;display:inline-block;"></span><span style="font-size:13px;color:var(--ink);">AI summaries (coded fallback)</span><span style="font-size:11px;color:var(--muted);margin-left:auto;white-space:nowrap;">P4</span></div>
+          <div style="display:flex;align-items:center;gap:8px;"><span style="width:8px;height:8px;border-radius:50%;background:#7C3AED;flex-shrink:0;display:inline-block;"></span><span style="font-size:13px;color:var(--ink);">Gaze heat maps</span><span style="font-size:11px;color:var(--muted);margin-left:auto;white-space:nowrap;">P5</span></div>
+          <div style="display:flex;align-items:center;gap:8px;"><span style="width:8px;height:8px;border-radius:50%;background:#7C3AED;flex-shrink:0;display:inline-block;"></span><span style="font-size:13px;color:var(--ink);font-weight:600;">Non-verbal gaze selection</span><span style="font-size:11px;color:var(--muted);margin-left:auto;white-space:nowrap;">P5</span></div>
+          <div style="display:flex;align-items:center;gap:8px;"><span style="width:8px;height:8px;border-radius:50%;background:#003361;flex-shrink:0;display:inline-block;"></span><span style="font-size:13px;color:var(--ink);font-weight:600;">NHS / FHIR integration</span><span style="font-size:11px;color:var(--muted);margin-left:auto;white-space:nowrap;">P6</span></div>
+        </div>
+      </div>
+
+      <!-- Q3: Low impact, Low effort -->
+      <div style="grid-column:2;grid-row:3;background:var(--faint);border:1px solid var(--border);border-top:none;border-radius:0 0 0 10px;padding:16px 18px;">
+        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:12px;">Lower priority · low effort — schedule in</div>
+        <div style="display:flex;flex-direction:column;gap:8px;">
+          <div style="display:flex;align-items:center;gap:8px;"><span style="width:8px;height:8px;border-radius:50%;background:var(--blue);opacity:.6;flex-shrink:0;display:inline-block;"></span><span style="font-size:13px;color:var(--muted);">Per-exercise difficulty override</span><span style="font-size:11px;color:var(--muted);margin-left:auto;white-space:nowrap;">P2</span></div>
+          <div style="display:flex;align-items:center;gap:8px;"><span style="width:8px;height:8px;border-radius:50%;background:var(--blue);opacity:.6;flex-shrink:0;display:inline-block;"></span><span style="font-size:13px;color:var(--muted);">Progress milestone celebrations</span><span style="font-size:11px;color:var(--muted);margin-left:auto;white-space:nowrap;">P2</span></div>
+        </div>
+      </div>
+
+      <!-- Q4: Low impact, High effort -->
+      <div style="grid-column:3;grid-row:3;background:var(--faint);border:1px solid var(--border);border-left:none;border-top:none;border-radius:0 0 10px 0;padding:16px 18px;">
+        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:12px;">Lower priority · high effort — plan carefully</div>
+        <div style="display:flex;flex-direction:column;gap:8px;">
+          <div style="display:flex;align-items:center;gap:8px;"><span style="width:8px;height:8px;border-radius:50%;background:#7C3AED;flex-shrink:0;display:inline-block;"></span><span style="font-size:13px;color:var(--muted);">Visual scanning exercises</span><span style="font-size:11px;color:var(--muted);margin-left:auto;white-space:nowrap;">P5</span></div>
+          <div style="display:flex;align-items:center;gap:8px;"><span style="width:8px;height:8px;border-radius:50%;background:var(--blue);flex-shrink:0;display:inline-block;"></span><span style="font-size:13px;color:var(--muted);">Adaptive real-time exercises</span><span style="font-size:11px;color:var(--muted);margin-left:auto;white-space:nowrap;">P6</span></div>
+          <div style="display:flex;align-items:center;gap:8px;"><span style="width:8px;height:8px;border-radius:50%;background:var(--blue);flex-shrink:0;display:inline-block;"></span><span style="font-size:13px;color:var(--muted);">Telehealth / remote session mode</span><span style="font-size:11px;color:var(--muted);margin-left:auto;white-space:nowrap;">P6</span></div>
+        </div>
+      </div>
+
+      <!-- X-axis label -->
+      <div style="grid-column:2/4;grid-row:4;text-align:center;padding:10px 0 0;font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);">← Difficulty →</div>
+    </div>
+
+    <!-- Legend -->
+    <div style="display:flex;flex-wrap:wrap;gap:16px;margin-top:16px;padding-top:14px;border-top:var(--line);">
+      <div style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted);"><span style="width:10px;height:10px;border-radius:50%;background:#22875C;display:inline-block;"></span>Live (Phase 1)</div>
+      <div style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted);"><span style="width:10px;height:10px;border-radius:50%;background:#6491C0;display:inline-block;"></span>Near-term (Phase 2)</div>
+      <div style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted);"><span style="width:10px;height:10px;border-radius:50%;background:#FEDC00;border:1.5px solid #C97D10;display:inline-block;"></span>Medium-term (Phases 3–4)</div>
+      <div style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted);"><span style="width:10px;height:10px;border-radius:50%;background:#7C3AED;display:inline-block;"></span>Future — Eye tracking (Phase 5)</div>
+      <div style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted);"><span style="width:10px;height:10px;border-radius:50%;background:#003361;display:inline-block;"></span>Vision (Phase 6)</div>
+    </div>
+  </div>
+
+  <!-- Vision -->
+  <div class="vision-block">
+    <h2>Why this matters beyond the app</h2>
+    <p>Brain injury rehabilitation has a data problem. Outcomes are recorded on paper, in spreadsheets, or in proprietary hospital systems that don't talk to each other. There's no shared understanding of what "good recovery" looks like at three months, at six months, at two years.</p>
+    <p>If Headway deploys this tool across its network of centres, we will, for the first time, have a longitudinal, structured record of cognitive rehabilitation outcomes at scale in the UK. That's not just useful for key workers. It's useful for researchers, for commissioning bodies, and eventually for the NHS. And with eye tracking, we open the door to clients who currently have no voice in their own rehabilitation — because their eyes can tell us what their hands and words cannot.</p>
+    <div class="principles">
+      <div class="principle">
+        <span class="principle-label">Privacy first</span>
+        <p>Clients are identifiers, not names. No PII in the data layer. Each role sees only what they need — GDPR-compliant by design, not retrofit.</p>
+      </div>
+      <div class="principle">
+        <span class="principle-label">Clinician-led</span>
+        <p>AI suggests. The key worker decides. Always. Every recommendation has an override. The human is never bypassed.</p>
+      </div>
+      <div class="principle">
+        <span class="principle-label">Open data</span>
+        <p>Anonymised aggregate data should be shareable with researchers. Knowledge shouldn't be locked in one charity's database.</p>
+      </div>
+    </div>
+  </div>
+
+  <footer class="doc-footer">
+    <p>Headway Cognitive Rehabilitation Tool · Product Roadmap v1.3 · July 2026<br>Prepared by Duncan Hendy · info@duncanhendy.com</p>
+    <div class="headway-badge"><span></span> Headway — the brain injury association</div>
+  </footer>
+
+</div>
+
+<script>
+  const mq = window.matchMedia('(prefers-color-scheme: dark)');
+  function applyTheme() { if (!document.documentElement.dataset.theme) document.documentElement.dataset.theme = mq.matches ? 'dark' : 'light'; }
+  applyTheme();
+  mq.addEventListener('change', applyTheme);
+</script>
